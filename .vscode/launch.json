@@ -1,0 +1,27 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch ...",
+      "internalConsoleOptions": "openOnSessionStart",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/distributable/sandbox/inny.js",
+      "args": [],
+      "runtimeArgs": [ "--experimental-import-meta-resolve" ],
+      "skipFiles": [ "<node_internals>/**" ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Test",
+      "internalConsoleOptions": "openOnSessionStart",
+      "program": "${workspaceFolder}/node_modules/jest/bin/jest.js",
+      "skipFiles": [ "<node_internals>/**" ],
+    }
+  ]
+}
