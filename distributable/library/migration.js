@@ -68,6 +68,7 @@ class Migration {
 
   static async getMigrationFromPath(path, includePattern, excludePattern, ...parameter) {
 
+    await FileSystem.ensureDir(path);
     let item = await FileSystem.readdir(path, { 'encoding': 'utf-8', 'withFileTypes': true });
 
     let getMigrationFromPathPromise = item.
@@ -88,7 +89,7 @@ class Migration {
 
     let migration = null;
     migration = await import(URL.pathToFileURL(path));
-    migration = migration.default ? migration.default : migration;
+    migration = migration.default || migration;
 
     return new migration(path, ...parameter);
 
