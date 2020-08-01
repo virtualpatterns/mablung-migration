@@ -1,5 +1,4 @@
 {
-  "retainLines": true,
   "plugins": [
     "@babel/plugin-proposal-optional-chaining",
     "@babel/plugin-syntax-import-meta",
@@ -44,5 +43,6 @@
     ]
   ],
   "presets": [],
+  "retainLines": true,
   "sourceType": "module"
 }
