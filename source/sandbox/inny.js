@@ -1,4 +1,4 @@
-import '@virtualpatterns/mablung-source-map-support/install.js'
+import '@virtualpatterns/mablung-source-map-support/install'
 
 class A {
 

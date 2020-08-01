@@ -1,4 +1,4 @@
-import '@virtualpatterns/mablung-source-map-support/install.js'
+import '@virtualpatterns/mablung-source-map-support/install'
 import Command from 'commander'
 import { FileSystem } from '@virtualpatterns/mablung-file-system'
 import JSON5 from 'json5'
