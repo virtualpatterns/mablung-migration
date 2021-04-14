@@ -35,7 +35,7 @@ Command
 
     try {
 
-      let Migration = await importMigration(Command.migrationClassPath, Command.migrationExportName)
+      let Migration = await importMigration(Command.opts().migrationClassPath, Command.opts().migrationExportName)
 
       for (let migration of (await Migration.getMigration(...parameter))) {
         console.log(`'${Path.relative('', migration.path)}' is ${(await migration.isInstalled()) ? '' : 'NOT '}installed`)
@@ -55,7 +55,7 @@ Command
   .description('Create a new migration with the given name in the default folder')
   .action(async (name) => {
 
-    let Migration = await importMigration(Command.migrationClassPath, Command.migrationExportName)
+    let Migration = await importMigration(Command.opts().migrationClassPath, Command.opts().migrationExportName)
 
     try {
 
@@ -74,7 +74,7 @@ Command
   .description('Install known, uninstalled migrations')
   .action(async (parameter) => {
 
-    let Migration = await importMigration(Command.migrationClassPath, Command.migrationExportName)
+    let Migration = await importMigration(Command.opts().migrationClassPath, Command.opts().migrationExportName)
 
     try {
 
@@ -93,7 +93,7 @@ Command
   .description('Uninstall all known, installed migrations')
   .action(async (parameter) => {
 
-    let Migration = await importMigration(Command.migrationClassPath, Command.migrationExportName)
+    let Migration = await importMigration(Command.opts().migrationClassPath, Command.opts().migrationExportName)
 
     try {
 
