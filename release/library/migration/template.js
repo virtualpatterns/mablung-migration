@@ -17,4 +17,5 @@ class Migration extends BaseMigration {
 
 
 export default Migration;
+
 //# sourceMappingURL=template.js.map

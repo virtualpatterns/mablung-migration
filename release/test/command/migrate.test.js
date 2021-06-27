@@ -9,12 +9,12 @@ import { Migration } from './migration.js';
 const FilePath = _URL.fileURLToPath(import.meta.url);
 const FolderPath = Path.dirname(FilePath);
 
-Test.serial('migrate list', async test => {
+Test.serial('migrate list', async (test) => {
   let process = new MigrateProcess({ 'list': true });
   test.is(await process.whenExit(), 0);
 });
 
-Test.serial('migrate create', async test => {
+Test.serial('migrate create', async (test) => {
 
   let name = 'migrate-create';
 
@@ -26,9 +26,9 @@ Test.serial('migrate create', async test => {
 
   let item = await FileSystem.readdir(folderPath, { 'encoding': 'utf-8', 'withFileTypes': true });
   let path = item.
-  filter(item => item.isFile()).
-  filter(file => Match(file.name, pattern)).
-  map(file => `${folderPath}/${file.name}`);
+  filter((item) => item.isFile()).
+  filter((file) => Match(file.name, pattern)).
+  map((file) => `${folderPath}/${file.name}`);
 
   test.is(path.length, 1);
 
@@ -36,7 +36,7 @@ Test.serial('migrate create', async test => {
 
 });
 
-Test.serial('migrate install', async test => {
+Test.serial('migrate install', async (test) => {
 
   let process = new MigrateProcess({ 'install': true });
   test.is(await process.whenExit(), 0);
@@ -48,7 +48,7 @@ Test.serial('migrate install', async test => {
 
 });
 
-Test.serial('migrate uninstall', async test => {
+Test.serial('migrate uninstall', async (test) => {
 
   let process = new MigrateProcess({ 'uninstall': true });
   test.is(await process.whenExit(), 0);
@@ -59,4 +59,5 @@ Test.serial('migrate uninstall', async test => {
   test.is(await migration[0].isInstalled(), false);
 
 });
+
 //# sourceMappingURL=migrate.test.js.map

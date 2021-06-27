@@ -8,7 +8,7 @@ import { Migration } from '../library//migration.js';
 const FilePath = _URL.fileURLToPath(import.meta.url);
 const FolderPath = Path.dirname(FilePath);
 
-Test.serial('Migration.createMigration(name)', async test => {
+Test.serial('Migration.createMigration(name)', async (test) => {
 
   let name = 'migration-create-migration';
 
@@ -19,9 +19,9 @@ Test.serial('Migration.createMigration(name)', async test => {
 
   let item = await FileSystem.readdir(folderPath, { 'encoding': 'utf-8', 'withFileTypes': true });
   let path = item.
-  filter(item => item.isFile()).
-  filter(file => Match(file.name, pattern)).
-  map(file => `${folderPath}/${file.name}`);
+  filter((item) => item.isFile()).
+  filter((file) => Match(file.name, pattern)).
+  map((file) => `${folderPath}/${file.name}`);
 
   test.is(path.length, 1);
 
@@ -29,7 +29,7 @@ Test.serial('Migration.createMigration(name)', async test => {
 
 });
 
-Test.serial('Migration.getMigration()', async test => {
+Test.serial('Migration.getMigration()', async (test) => {
 
   let migration = await Migration.getMigration();
 
@@ -44,7 +44,7 @@ Test.serial('Migration.getMigration()', async test => {
 
 });
 
-Test.serial('Migration.installMigration()', async test => {
+Test.serial('Migration.installMigration()', async (test) => {
 
   await Migration.installMigration();
 
@@ -58,7 +58,7 @@ Test.serial('Migration.installMigration()', async test => {
 
 });
 
-Test.serial('Migration.uninstallMigration()', async test => {
+Test.serial('Migration.uninstallMigration()', async (test) => {
 
   await Migration.uninstallMigration();
 
@@ -71,4 +71,5 @@ Test.serial('Migration.uninstallMigration()', async test => {
   test.is(await migration[2].isInstalled(), false);
 
 });
+
 //# sourceMappingURL=migration.test.js.map

@@ -22,4 +22,5 @@ class Migration extends BaseMigration {
 
 
 export { Migration };
+
 //# sourceMappingURL=migration.js.map

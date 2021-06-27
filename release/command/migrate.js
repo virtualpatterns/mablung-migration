@@ -31,7 +31,7 @@ option('--migration-export-name <name>', 'Exported name of the migration class t
 Command.
 command('list [parameter...]').
 description('List all known migrations').
-action(async parameter => {
+action(async (parameter) => {
 
   try {
 
@@ -53,7 +53,7 @@ action(async parameter => {
 Command.
 command('create <name>').
 description('Create a new migration with the given name in the default folder').
-action(async name => {
+action(async (name) => {
 
   let Migration = await importMigration(Command.opts().migrationClassPath, Command.opts().migrationExportName);
 
@@ -72,7 +72,7 @@ action(async name => {
 Command.
 command('install [parameter...]').
 description('Install known, uninstalled migrations').
-action(async parameter => {
+action(async (parameter) => {
 
   let Migration = await importMigration(Command.opts().migrationClassPath, Command.opts().migrationExportName);
 
@@ -91,7 +91,7 @@ action(async parameter => {
 Command.
 command('uninstall [parameter...]').
 description('Uninstall all known, installed migrations').
-action(async parameter => {
+action(async (parameter) => {
 
   let Migration = await importMigration(Command.opts().migrationClassPath, Command.opts().migrationExportName);
 
@@ -108,4 +108,5 @@ action(async parameter => {
 });
 
 Command.parse(Process.argv);
+
 //# sourceMappingURL=migrate.js.map

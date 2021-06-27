@@ -9,4 +9,5 @@ class Migration extends BaseMigration {
 
 
 export default Migration;
+
 //# sourceMappingURL=00000000000001-null.js.map

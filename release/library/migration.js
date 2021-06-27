@@ -72,14 +72,14 @@ class Migration {
     let item = await FileSystem.readdir(path, { 'encoding': 'utf-8', 'withFileTypes': true });
 
     let getMigrationFromPathPromise = item.
-    filter(item => item.isDirectory()).
-    map(directory => this.getMigrationFromPath(`${path}/${directory.name}`, includePattern, excludePattern, ...parameter));
+    filter((item) => item.isDirectory()).
+    map((directory) => this.getMigrationFromPath(`${path}/${directory.name}`, includePattern, excludePattern, ...parameter));
 
     let importMigrationPromise = item.
-    filter(item => item.isFile()).
-    filter(file => includePattern.reduce((isMatch, pattern) => isMatch ? isMatch : Match(file.name, pattern), false)).
-    filter(file => !excludePattern.reduce((isMatch, pattern) => isMatch ? isMatch : Match(file.name, pattern), false)).
-    map(file => this.importMigration(`${path}/${file.name}`, ...parameter));
+    filter((item) => item.isFile()).
+    filter((file) => includePattern.reduce((isMatch, pattern) => isMatch ? isMatch : Match(file.name, pattern), false)).
+    filter((file) => !excludePattern.reduce((isMatch, pattern) => isMatch ? isMatch : Match(file.name, pattern), false)).
+    map((file) => this.importMigration(`${path}/${file.name}`, ...parameter));
 
     return (await Promise.all([...getMigrationFromPathPromise, ...importMigrationPromise])).flat().sort();
 
@@ -124,4 +124,5 @@ class Migration {
 
 
 export { Migration };
+
 //# sourceMappingURL=migration.js.map
