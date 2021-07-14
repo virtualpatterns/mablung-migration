@@ -3,7 +3,7 @@
   "ava": {
     "failFast": true,
     "files": [
-      "release/**/test/*.test.*"
+      "release/**/test/**/*.test.*"
     ],
     "nodeArguments": [
       "--no-warnings",
@@ -20,7 +20,10 @@
   "c8": {
     "all": true,
     "exclude": [
-      "release/sandbox"
+      "release/library/migration",
+      "release/sandbox",
+      "release/test/command/migration",
+      "release/test/library/migration"
     ],
     "reporter": [
       "html"
