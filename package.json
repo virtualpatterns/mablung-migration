@@ -50,7 +50,7 @@
     "test": "make test"
   },
   "type": "module",
-  "version": "0.0.1-9",
+  "version": "0.0.1-10",
   "dependencies": {
     "@virtualpatterns/mablung-file-system": "0.0.2-16",
     "commander": "^8.0.0",
