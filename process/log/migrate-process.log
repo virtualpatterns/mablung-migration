@@ -1,0 +1,10 @@
+'release/test/command/migration/00000000000000-null.js' is NOT installed
+ChildProcess.on('disconnect', this.__onDisconnect = () => { ... })
+ChildProcess.on('exit', this.__onExit = (0, null) => { ... })
+Created source/test/command/migration/20210715031044-migrate-create.js
+ChildProcess.on('disconnect', this.__onDisconnect = () => { ... })
+ChildProcess.on('exit', this.__onExit = (0, null) => { ... })
+ChildProcess.on('disconnect', this.__onDisconnect = () => { ... })
+ChildProcess.on('exit', this.__onExit = (0, null) => { ... })
+ChildProcess.on('disconnect', this.__onDisconnect = () => { ... })
+ChildProcess.on('exit', this.__onExit = (0, null) => { ... })

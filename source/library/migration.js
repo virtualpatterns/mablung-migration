@@ -62,42 +62,42 @@ class Migration {
 
   }
 
-  static getMigration(...parameter) {
-    return this.getMigrationFromPath(`${FolderPath}/migration`, [ '*.js' ], [ 'template.js' ], ...parameter)
+  static getMigration(...argument) {
+    return this.getMigrationFromPath(`${FolderPath}/migration`, [ '*.js' ], [ 'template.js' ], ...argument)
   }
 
-  static async getMigrationFromPath(path, includePattern, excludePattern, ...parameter) {
+  static async getMigrationFromPath(path, includePattern, excludePattern, ...argument) {
 
     await FileSystem.ensureDir(path)
     let item = await FileSystem.readdir(path, { 'encoding': 'utf-8', 'withFileTypes': true })
 
     let getMigrationFromPathPromise = item
       .filter((item) => item.isDirectory())
-      .map((directory) => this.getMigrationFromPath(`${path}/${directory.name}`, includePattern, excludePattern, ...parameter))
+      .map((directory) => this.getMigrationFromPath(`${path}/${directory.name}`, includePattern, excludePattern, ...argument))
 
     let importMigrationPromise = item
       .filter((item) => item.isFile())
       .filter((file) => includePattern.reduce((isMatch, pattern) => isMatch ? isMatch : Match(file.name, pattern), false))
       .filter((file) => !excludePattern.reduce((isMatch, pattern) => isMatch ? isMatch : Match(file.name, pattern), false))
-      .map((file) => this.importMigration(`${path}/${file.name}`, ...parameter))
+      .map((file) => this.importMigration(`${path}/${file.name}`, ...argument))
 
     return (await Promise.all([...getMigrationFromPathPromise, ...importMigrationPromise])).flat().sort()
 
   }
 
-  static async importMigration(path, ...parameter) {
+  static async importMigration(path, ...argument) {
 
     let migration = null
     migration = await import(URL.pathToFileURL(path))
     migration = migration.default || migration
 
-    return new migration(path, ...parameter)
+    return new migration(path, ...argument)
     
   }
 
-  static async installMigration(...parameter) {
+  static async installMigration(...argument) {
 
-    for (let migration of (await this.getMigration(...parameter))) {
+    for (let migration of (await this.getMigration(...argument))) {
 
       if (await migration.isInstalled()) {
         // do nothing
@@ -109,9 +109,9 @@ class Migration {
 
   }
 
-  static async uninstallMigration(...parameter) {
+  static async uninstallMigration(...argument) {
 
-    for (let migration of (await this.getMigration(...parameter)).reverse()) {
+    for (let migration of (await this.getMigration(...argument)).reverse()) {
 
       if (await migration.isInstalled()) {
         await migration.uninstall()

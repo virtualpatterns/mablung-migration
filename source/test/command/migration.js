@@ -15,8 +15,8 @@ class Migration extends BaseMigration {
     return super.createMigration(name, path, templatePath)
   }
 
-  static async getMigration(...parameter) {
-    return (await Promise.all([ super.getMigration(...parameter), super.getMigrationFromPath(`${FolderPath}/migration`, [ '*.js' ], [ 'template.js' ], ...parameter) ])).flat().sort()
+  static async getMigration(...argument) {
+    return (await Promise.all([ super.getMigration(...argument), super.getMigrationFromPath(`${FolderPath}/migration`, [ '*.js' ], [ 'template.js' ], ...argument) ])).flat().sort()
   }
 
 }

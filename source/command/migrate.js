@@ -37,7 +37,7 @@ Command
 
       let Migration = await importMigration(Command.opts().migrationClassPath, Command.opts().migrationExportName)
 
-      for (let migration of (await Migration.getMigration(...parameter))) {
+      for (let migration of (await Migration.getMigration(...argument))) {
         console.log(`'${Path.relative('', migration.path)}' is ${(await migration.isInstalled()) ? '' : 'NOT '}installed`)
       }
 
@@ -78,7 +78,7 @@ Command
 
     try {
 
-      await Migration.installMigration(...parameter)
+      await Migration.installMigration(...argument)
       Process.exit(0)
 
     } catch (error) {
@@ -97,7 +97,7 @@ Command
 
     try {
 
-      await Migration.uninstallMigration(...parameter)
+      await Migration.uninstallMigration(...argument)
       Process.exit(0)
 
     } catch (error) {
