@@ -36,9 +36,9 @@
     "./package.json": "./package.json"
   },
   "files": [
-    "/release/command",
-    "/release/library",
-    "/release/index.js"
+    "release/command",
+    "release/library",
+    "release/index.js"
   ],
   "license": "GPL-3.0+",
   "name": "@virtualpatterns/mablung-migration",
@@ -65,7 +65,7 @@
     "@babel/plugin-proposal-optional-chaining": "^7.14.5",
     "@babel/plugin-syntax-import-meta": "^7.10.4",
     "@pwn/is": "^1.0.2",
-    "@virtualpatterns/mablung-babel-plugin-replace-identifier": "0.0.1-23",
+    "@virtualpatterns/babel-plugin-mablung-replace-identifier": "0.0.1-23",
     "@virtualpatterns/mablung-check-dependency": "0.0.1-55",
     "@virtualpatterns/mablung-configuration": "0.0.2-25",
     "@virtualpatterns/mablung-makefile": "0.0.1-76",
