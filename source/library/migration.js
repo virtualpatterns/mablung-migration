@@ -1,48 +1,42 @@
 import { FileSystem } from '@virtualpatterns/mablung-file-system'
-import Luxon from 'luxon'
+import { DateTime } from 'luxon'
+import Is from '@pwn/is'
 import Match from 'minimatch'
 import Path from 'path'
-import URL from 'url'
 
-const { DateTime } = Luxon
 const FilePath = __filePath
 const FolderPath = Path.dirname(FilePath)
 
 class Migration {
 
   constructor(path) {
-    this._path = path
-    this._name = Path.basename(this._path, Path.extname(this._path))
+    this.path = path
   }
 
-  /* c8 ignore next 3 */
-  get path() {
-    return this._path
-  }
-
-  /* c8 ignore next 3 */
   get name() {
-    return this._name
+    return Path.basename(this.path, Path.extname(this.path))
   }
 
   async isInstalled() {
-    return   (await FileSystem.pathExists(`${Path.dirname(this._path)}/${this._name}.installed`)) && 
-            !(await FileSystem.pathExists(`${Path.dirname(this._path)}/${this._name}.uninstalled`))
+    return Is.deepEqual(await Promise.all([
+      FileSystem.pathExists(`${this.path}.installed`),
+      FileSystem.pathExists(`${this.path}.uninstalled`)
+    ]), [ true, false ])
+  }
+
+  async isNotInstalled() {
+    return !(await this.isInstalled())
   }
 
   install() {
     return Promise.all([
-      FileSystem.touch(`${Path.dirname(this._path)}/${this._name}.installed`),
-      FileSystem.remove(`${Path.dirname(this._path)}/${this._name}.uninstalled`)
+      FileSystem.touch(`${this.path}.installed`),
+      FileSystem.remove(`${this.path}.uninstalled`)
     ])
   }
 
   uninstall() {
-    return FileSystem.touch(`${Path.dirname(this._path)}/${this._name}.uninstalled`)
-  }
-
-  toString() {
-    return this._name
+    return FileSystem.touch(`${this.path}.uninstalled`)
   }
 
   static async createMigration(name, path = Path.normalize(`${FolderPath}/../../source/library/migration`), templatePath = Path.normalize(`${FolderPath}/../../source/library/migration/template.js`)) {
@@ -62,47 +56,54 @@ class Migration {
 
   }
 
-  static getMigration(...argument) {
-    return this.getMigrationFromPath(`${FolderPath}/migration`, [ '*.js' ], [ 'template.js' ], ...argument)
+  static async getMigration(...argument) {
+
+    let migration = await Promise.all(this.getRawMigration(...argument))
+    return migration.sort((leftMigration, rightMigration) => leftMigration.name.localeCompare(rightMigration.name))
+  
   }
 
-  static async getMigrationFromPath(path, includePattern, excludePattern, ...argument) {
+  static getRawMigration(...argument) {
+    return this.getRawMigrationFromPath(`${FolderPath}/migration`, [ '*.js' ], [ 'template.js' ], ...argument)
+  }
 
-    await FileSystem.ensureDir(path)
-    let item = await FileSystem.readdir(path, { 'encoding': 'utf-8', 'withFileTypes': true })
+  static getRawMigrationFromPath(path, includePattern, excludePattern, ...argument) {
 
-    let getMigrationFromPathPromise = item
+    let item = FileSystem.readdirSync(path, { 'encoding': 'utf-8', 'withFileTypes': true })
+
+    let getRawMigrationFromPath = item
       .filter((item) => item.isDirectory())
-      .map((directory) => this.getMigrationFromPath(`${path}/${directory.name}`, includePattern, excludePattern, ...argument))
+      .map((directory) => this.getRawMigrationFromPath(`${path}/${directory.name}`, includePattern, excludePattern, ...argument))
 
-    let importMigrationPromise = item
+    let importMigration = item
       .filter((item) => item.isFile())
       .filter((file) => includePattern.reduce((isMatch, pattern) => isMatch ? isMatch : Match(file.name, pattern), false))
       .filter((file) => !excludePattern.reduce((isMatch, pattern) => isMatch ? isMatch : Match(file.name, pattern), false))
       .map((file) => this.importMigration(`${path}/${file.name}`, ...argument))
 
-    return (await Promise.all([...getMigrationFromPathPromise, ...importMigrationPromise])).flat().sort()
+    return [ ...getRawMigrationFromPath, ...importMigration ].flat()
+    // return importMigration
 
   }
 
   static async importMigration(path, ...argument) {
 
-    let migration = null
-    migration = await import(URL.pathToFileURL(path))
-    migration = migration.default || migration
+    let Migration = null
+    Migration = await import(path)
+    Migration = Migration.Migration || Migration
 
-    return new migration(path, ...argument)
+    return new Migration(path, ...argument)
     
   }
 
   static async installMigration(...argument) {
 
-    for (let migration of (await this.getMigration(...argument))) {
+    let migration = await this.getMigration(...argument)
 
-      if (await migration.isInstalled()) {
-        // do nothing
-      } else {
-        await migration.install()
+    for (let item of migration) {
+
+      if (await item.isNotInstalled()) {
+        await item.install()
       }
 
     }
@@ -111,10 +112,12 @@ class Migration {
 
   static async uninstallMigration(...argument) {
 
-    for (let migration of (await this.getMigration(...argument)).reverse()) {
+    let migration = await this.getMigration(...argument)
 
-      if (await migration.isInstalled()) {
-        await migration.uninstall()
+    for (let item of migration.reverse()) {
+
+      if (await item.isInstalled()) {
+        await item.uninstall()
       }
 
     }

@@ -2,8 +2,6 @@ import { Check } from '@virtualpatterns/mablung-check-dependency'
 
 import Test from 'ava'
 
-const Process = process
-
 Test('default', async (test) => {
 
   let dependency = await Check()

@@ -3,12 +3,12 @@ import Match from 'minimatch'
 import Path from 'path'
 import Test from 'ava'
 
-import { Migration } from '../library//migration.js'
+import { Migration } from './migration.js'
 
 const FilePath = __filePath
 const FolderPath = Path.dirname(FilePath)
 
-Test.serial('Migration.createMigration(name)', async (test) => {
+Test.serial('createMigration(name)', async (test) => {
 
   let name = 'migration-create-migration'
 
@@ -29,11 +29,12 @@ Test.serial('Migration.createMigration(name)', async (test) => {
 
 })
 
-Test.serial('Migration.getMigration()', async (test) => {
+Test.serial('getMigration()', async (test) => {
 
   let migration = await Migration.getMigration()
 
-  test.is(migration.length, 3)
+  // test.log(migration.map((item) => Path.relative('', item.path)))
+  test.is(migration.length, 4)
 
   test.is(migration[0].name, '00000000000000-null')
   test.is(await migration[0].isInstalled(), false)
@@ -41,33 +42,43 @@ Test.serial('Migration.getMigration()', async (test) => {
   test.is(await migration[1].isInstalled(), false)
   test.is(migration[2].name, '00000000000002-null')
   test.is(await migration[2].isInstalled(), false)
+  test.is(migration[3].name, '00000000000003-null')
+  test.is(await migration[3].isInstalled(), false)
 
 })
 
-Test.serial('Migration.installMigration()', async (test) => {
+Test.serial('installMigration()', async (test) => {
 
   await Migration.installMigration()
 
-  let migration = await Migration.getMigration()
+  try {
 
-  test.is(migration.length, 3)
+    let migration = await Migration.getMigration()
 
-  test.is(await migration[0].isInstalled(), true)
-  test.is(await migration[1].isInstalled(), true)
-  test.is(await migration[2].isInstalled(), true)
+    test.is(migration.length, 4)
+
+    test.is(await migration[0].isInstalled(), true)
+    test.is(await migration[1].isInstalled(), true)
+    test.is(await migration[2].isInstalled(), true)
+    test.is(await migration[3].isInstalled(), true)
+
+  } finally {
+    await Migration.uninstallMigration()
+  }
 
 })
 
-Test.serial('Migration.uninstallMigration()', async (test) => {
+Test.serial('uninstallMigration()', async (test) => {
 
   await Migration.uninstallMigration()
 
   let migration = await Migration.getMigration()
 
-  test.is(migration.length, 3)
+  test.is(migration.length, 4)
   
   test.is(await migration[0].isInstalled(), false)
   test.is(await migration[1].isInstalled(), false)
   test.is(await migration[2].isInstalled(), false)
+  test.is(await migration[3].isInstalled(), false)
 
 })

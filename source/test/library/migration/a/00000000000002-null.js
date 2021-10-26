@@ -8,4 +8,4 @@ class Migration extends BaseMigration {
 
 }
 
-export default Migration
+export { Migration }

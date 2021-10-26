@@ -1,34 +1,7 @@
 {
   "author": "virtualpatterns.com <code@virtualpatterns.com> (http://www.virtualpatterns.com)",
-  "ava": {
-    "failFast": true,
-    "files": [
-      "release/**/test/**/*.test.*"
-    ],
-    "nodeArguments": [
-      "--no-warnings",
-      "--unhandled-rejections=strict"
-    ],
-    "require": [
-      "@virtualpatterns/mablung-source-map-support/install"
-    ],
-    "verbose": true
-  },
   "bin": {
-    "migrate": "./release/command/migrate.js"
-  },
-  "c8": {
-    "all": true,
-    "exclude": [
-      "release/library/migration",
-      "release/sandbox",
-      "release/test/command/migration",
-      "release/test/library/migration"
-    ],
-    "reporter": [
-      "html"
-    ],
-    "src": "release"
+    "migrate": "./release/command/index.js"
   },
   "description": "TBD",
   "exports": {
@@ -46,36 +19,22 @@
     "type": "git",
     "url": "https://github.com/virtualpatterns/mablung-migration"
   },
-  "scripts": {
-    "test": "make test"
-  },
   "type": "module",
   "version": "0.0.1-11",
   "dependencies": {
+    "@pwn/is": "^1.0.2",
     "@virtualpatterns/mablung-file-system": "0.0.2-21",
     "commander": "^8.3.0",
-    "json5": "^2.2.0",
     "luxon": "^2.0.2",
     "minimatch": "^3.0.4"
   },
   "devDependencies": {
-    "@babel/cli": "^7.15.7",
-    "@babel/core": "^7.15.8",
-    "@babel/eslint-parser": "^7.15.8",
-    "@babel/plugin-proposal-optional-chaining": "^7.14.5",
-    "@babel/plugin-syntax-import-meta": "^7.10.4",
-    "@pwn/is": "^1.0.2",
-    "@virtualpatterns/babel-plugin-mablung-replace-identifier": "0.0.26-6",
+    "@virtualpatterns/babel-preset-mablung-makefile-environment": "0.0.26-4",
+    "@virtualpatterns/eslint-config-mablung-makefile-environment": "0.0.26-4",
     "@virtualpatterns/mablung-check-dependency": "0.0.26-19",
-    "@virtualpatterns/mablung-configuration": "0.0.2-38",
-    "@virtualpatterns/mablung-makefile": "0.0.26-99",
+    "@virtualpatterns/mablung-makefile-environment": "0.0.26-15",
     "@virtualpatterns/mablung-source-map-support": "0.0.26-20",
     "@virtualpatterns/mablung-worker": "0.0.2-81",
-    "ava": "^3.15.0",
-    "c8": "^7.10.0",
-    "eslint": "^8.1.0",
-    "eslint-plugin-babel": "^5.3.1",
-    "npm-check-updates": "^11.8.5",
-    "shx": "^0.3.3"
+    "ava": "^3.15.0"
   }
 }

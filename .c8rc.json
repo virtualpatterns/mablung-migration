@@ -1,0 +1,17 @@
+{
+  "all": true,
+  "exclude": [
+    "release/header",
+    "release/library/migration",
+    "release/sandbox",
+    "release/test/command/migration",
+    "release/test/library/migration",
+    "ava.config.cjs"
+  ],
+  "reporter": [
+    "html",
+    "text-summary"
+  ],
+  "src": "release",
+  "tempDirectory": "data/coverage"
+}
