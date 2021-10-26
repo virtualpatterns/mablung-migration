@@ -9,9 +9,8 @@ import { Migration } from './migration.js'
 const FilePath = __filePath
 const FolderPath = Path.dirname(FilePath)
 const LogPath = FilePath.replace('/release/', '/data/').replace(/\.test\.js$/, '.log')
-const Require = __require
-
 const LoggedProcess = CreateLoggedProcess(ForkedProcess, LogPath)
+const Require = __require
 
 Test.before(async () => {
   await FileSystem.ensureDir(Path.dirname(LogPath))
@@ -50,6 +49,19 @@ Test.serial('create', async (test) => {
 
 })
 
+Test('create throws Error', async (test) => {
+
+  let name = 'mablung-migration-create'
+
+  let process = new LoggedProcess(Require.resolve('../../command/index.js'), {
+    '--migration-class-path': `${FolderPath}/error.js`,
+    'create': name
+  })
+
+  test.is(await process.whenExit(), 1)
+
+})
+
 Test.serial('list', async (test) => {
 
   let process = new LoggedProcess(Require.resolve('../../command/index.js'), {
@@ -58,6 +70,17 @@ Test.serial('list', async (test) => {
   })
 
   test.is(await process.whenExit(), 0)
+
+})
+
+Test.serial('list throws Error', async (test) => {
+
+  let process = new LoggedProcess(Require.resolve('../../command/index.js'), {
+    '--migration-class-path': `${FolderPath}/error.js`,
+    'list': true
+  })
+
+  test.is(await process.whenExit(), 1)
 
 })
 
@@ -77,6 +100,17 @@ Test.serial('install', async (test) => {
 
 })
 
+Test.serial('install throws Error', async (test) => {
+
+  let process = new LoggedProcess(Require.resolve('../../command/index.js'), {
+    '--migration-class-path': `${FolderPath}/error.js`,
+    'install': true
+  })
+
+  test.is(await process.whenExit(), 1)
+
+})
+
 Test.serial('uninstall', async (test) => {
 
   let process = new LoggedProcess(Require.resolve('../../command/index.js'), {
@@ -90,5 +124,16 @@ Test.serial('uninstall', async (test) => {
 
   test.is(migration.length, 2)
   test.is(await migration[1].isInstalled(), false)
+
+})
+
+Test.serial('uninstall throws Error', async (test) => {
+
+  let process = new LoggedProcess(Require.resolve('../../command/index.js'), {
+    '--migration-class-path': `${FolderPath}/error.js`,
+    'uninstall': true
+  })
+
+  test.is(await process.whenExit(), 1)
 
 })
