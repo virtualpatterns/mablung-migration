@@ -1,8 +1,6 @@
 {
   "author": "virtualpatterns.com <code@virtualpatterns.com> (http://www.virtualpatterns.com)",
-  "bin": {
-    "migrate": "./release/command/index.js"
-  },
+  "bin": "./release/command/index.js",
   "description": "TBD",
   "exports": {
     ".": "./release/index.js",
