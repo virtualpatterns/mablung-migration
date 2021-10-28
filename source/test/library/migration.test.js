@@ -36,13 +36,13 @@ Test.serial('getMigration()', async (test) => {
   // test.log(migration.map((item) => Path.relative('', item.path)))
   test.is(migration.length, 4)
 
-  test.is(migration[0].name, '00000000000000-null')
+  test.is(migration[0].name, '20211027025141-initial')
   test.is(await migration[0].isInstalled(), false)
-  test.is(migration[1].name, '00000000000001-null')
+  test.is(migration[1].name, '20211027235941-null')
   test.is(await migration[1].isInstalled(), false)
-  test.is(migration[2].name, '00000000000002-null')
+  test.is(migration[2].name, '20211028000015-null')
   test.is(await migration[2].isInstalled(), false)
-  test.is(migration[3].name, '00000000000003-null')
+  test.is(migration[3].name, '20211028000056-null')
   test.is(await migration[3].isInstalled(), false)
 
 })

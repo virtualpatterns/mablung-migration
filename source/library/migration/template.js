@@ -6,12 +6,12 @@ class Migration extends BaseMigration {
     super(path)
   }
 
-  async install() {
-    await super.install()
+  install() {
+    return super.install()
   }
 
-  async uninstall() {
-    await super.uninstall()
+  uninstall() {
+    return super.uninstall()
   }
 
 }
