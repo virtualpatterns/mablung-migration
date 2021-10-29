@@ -57,10 +57,7 @@ class Migration {
   }
 
   static async getMigration(...argument) {
-
-    let migration = await Promise.all(this.getRawMigration(...argument))
-    return migration.sort((leftMigration, rightMigration) => leftMigration.name.localeCompare(rightMigration.name))
-  
+    return (await Promise.all(this.getRawMigration(...argument))).sort((leftMigration, rightMigration) => leftMigration.name.localeCompare(rightMigration.name))
   }
 
   static getRawMigration(...argument) {
@@ -82,7 +79,6 @@ class Migration {
       .map((file) => this.importMigration(`${path}/${file.name}`, ...argument))
 
     return [ ...getRawMigrationFromPath, ...importMigration ].flat()
-    // return importMigration
 
   }
 

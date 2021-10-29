@@ -3,8 +3,8 @@ export function CreateMigration(migrationClass, defaultSourceMigrationPath, defa
  
   class Migration extends migrationClass {
 
-    constructor(path) {
-      super(path)
+    constructor(...argument) {
+      super(...argument)
     }
 
     static createMigration(name, migrationPath = defaultSourceMigrationPath, templatePath = defaultSourceTemplatePath) {

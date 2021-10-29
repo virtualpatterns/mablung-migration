@@ -24,7 +24,7 @@ Test.serial('default', async (test) => {
 
 Test.serial('create', async (test) => {
 
-  let name = 'mablung-migration-create'
+  let name = 'create'
 
   let process = new LoggedProcess(Require.resolve('../../command/index.js'), {
     '--migration-class-path': Require.resolve('./migration.js'),
@@ -51,7 +51,7 @@ Test.serial('create', async (test) => {
 
 Test('create throws Error', async (test) => {
 
-  let name = 'mablung-migration-create'
+  let name = 'create'
 
   let process = new LoggedProcess(Require.resolve('../../command/index.js'), {
     '--migration-class-path': `${FolderPath}/error.js`,
