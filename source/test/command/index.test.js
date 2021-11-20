@@ -1,5 +1,6 @@
-import { CreateLoggedProcess, ForkedProcess } from '@virtualpatterns/mablung-worker'
+import { CreateLoggedProcess } from '@virtualpatterns/mablung-worker/test'
 import { FileSystem } from '@virtualpatterns/mablung-file-system'
+import { ForkedProcess } from '@virtualpatterns/mablung-worker'
 import Match from 'minimatch'
 import Path from 'path'
 import Test from 'ava'
@@ -8,9 +9,10 @@ import { Migration } from './migration.js'
 
 const FilePath = __filePath
 const FolderPath = Path.dirname(FilePath)
+const Require = __require
+
 const LogPath = FilePath.replace('/release/', '/data/').replace(/\.test\.js$/, '.log')
 const LoggedProcess = CreateLoggedProcess(ForkedProcess, LogPath)
-const Require = __require
 
 Test.before(async () => {
   await FileSystem.ensureDir(Path.dirname(LogPath))
