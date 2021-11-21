@@ -21,18 +21,18 @@
   "version": "0.0.1-27",
   "dependencies": {
     "@pwn/is": "^1.0.2",
-    "@virtualpatterns/mablung-file-system": "0.0.2-24",
+    "@virtualpatterns/mablung-file-system": "0.0.2-26",
     "commander": "^8.3.0",
     "luxon": "^2.1.1",
     "minimatch": "^3.0.4"
   },
   "devDependencies": {
-    "@virtualpatterns/babel-preset-mablung-makefile-environment": "0.0.26-9",
-    "@virtualpatterns/eslint-config-mablung-makefile-environment": "0.0.26-9",
-    "@virtualpatterns/mablung-check-dependency": "0.0.26-37",
-    "@virtualpatterns/mablung-makefile-environment": "0.0.26-29",
-    "@virtualpatterns/mablung-source-map-support": "0.0.26-42",
-    "@virtualpatterns/mablung-worker": "0.0.2-102",
+    "@virtualpatterns/babel-preset-mablung-makefile-environment": "0.0.26-11",
+    "@virtualpatterns/eslint-config-mablung-makefile-environment": "0.0.26-11",
+    "@virtualpatterns/mablung-check-dependency": "0.0.26-39",
+    "@virtualpatterns/mablung-makefile-environment": "0.0.26-31",
+    "@virtualpatterns/mablung-source-map-support": "0.0.26-44",
+    "@virtualpatterns/mablung-worker": "0.0.2-104",
     "ava": "^3.15.0"
   }
 }
