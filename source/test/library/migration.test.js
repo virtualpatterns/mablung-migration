@@ -4,12 +4,11 @@ import Path from 'path'
 import Test from 'ava'
 
 import { Migration } from './migration.js'
+import { Migration as NullMigration } from './migration/20211028000015-null.js'
 
 const FilePath = __filePath
 const FolderPath = Path.dirname(FilePath)
 const Require = __require
-
-const MigrationPath = Require.resolve('./migration/20211028000015-null.js')
 
 Test.beforeEach(() => {
   return Promise.all([
@@ -25,16 +24,16 @@ Test.beforeEach(() => {
 })
 
 Test.serial('Migration(\'...\')', (test) => {
-  test.notThrows(() => { new Migration(MigrationPath) })
+  test.notThrows(() => { new NullMigration() })
 })
 
 Test.serial('isInstalled() returns false', async (test) => {
-  test.is(await (new Migration(MigrationPath)).isInstalled(), false)
+  test.is(await (new NullMigration()).isInstalled(), false)
 })
 
 Test.serial('isInstalled() returns true', async (test) => {
 
-  let migration = new Migration(MigrationPath)
+  let migration = new NullMigration()
 
   await migration.install()
 
@@ -47,12 +46,12 @@ Test.serial('isInstalled() returns true', async (test) => {
 })
  
 Test.serial('isNotInstalled() returns true', async (test) => {
-  test.is(await (new Migration(MigrationPath)).isNotInstalled(), true)
+  test.is(await (new NullMigration()).isNotInstalled(), true)
 })
 
 Test.serial('isNotInstalled() returns false', async (test) => {
 
-  let migration = new Migration(MigrationPath)
+  let migration = new NullMigration()
 
   await migration.install()
 
@@ -66,7 +65,7 @@ Test.serial('isNotInstalled() returns false', async (test) => {
 
 Test.serial('install()', async (test) => {
 
-  let migration = new Migration(MigrationPath)
+  let migration = new NullMigration()
 
   await test.notThrowsAsync(migration.install())
 
@@ -80,7 +79,7 @@ Test.serial('install()', async (test) => {
 
 Test.serial('uninstall()', async (test) => {
 
-  let migration = new Migration(MigrationPath)
+  let migration = new NullMigration()
 
   await migration.install()
   await test.notThrowsAsync(migration.uninstall())
@@ -128,7 +127,7 @@ Test.serial('getMigration()', (test) => {
 
 Test.serial('importMigration(\'...\')', (test) => {
   return test.notThrowsAsync(async () => {
-    test.is((await Migration.importMigration(MigrationPath)).name, '20211028000015-null')
+    test.is((await Migration.importMigration(Require.resolve('./migration/20211028000015-null.js'))).name, '20211028000015-null')
   })
 })
 

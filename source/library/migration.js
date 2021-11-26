@@ -9,7 +9,7 @@ const FolderPath = Path.dirname(FilePath)
 
 class Migration {
 
-  constructor(path) {
+  constructor(path = FilePath) {
     this.path = path
   }
 
