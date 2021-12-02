@@ -4,6 +4,6 @@ import Path from 'path'
 const FilePath = __filePath
 const FolderPath = Path.dirname(FilePath)
 
-const Migration = CreateMigration(BaseMigration, Path.normalize(`${FolderPath}/../../../source/test/command/migration`), Path.normalize(`${FolderPath}/../../../source/test/command/migration/template.js`), `${FolderPath}/migration` )
+const Migration = CreateMigration(BaseMigration, Path.normalize(`${FolderPath}/../../../source/test/command/migration`), Path.normalize(`${FolderPath}/../../../source/library/migration/template.js`), `${FolderPath}/migration` )
 
 export { Migration }

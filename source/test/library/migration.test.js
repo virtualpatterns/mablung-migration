@@ -4,7 +4,7 @@ import Path from 'path'
 import Test from 'ava'
 
 import { Migration } from './migration.js'
-import { Migration as NullMigration } from './migration/20211028000015-null.js'
+import { Migration as NullMigration } from './migration/1638155586903-null.js'
 
 const FilePath = __filePath
 const FolderPath = Path.dirname(FilePath)
@@ -12,19 +12,21 @@ const Require = __require
 
 Test.beforeEach(() => {
   return Promise.all([
-    FileSystem.remove(`${Require.resolve('../../library/migration/20211027025141-initial.js')}.installed`),
-    FileSystem.remove(`${Require.resolve('../../library/migration/20211027025141-initial.js')}.uninstalled`),
-    FileSystem.remove(`${Require.resolve('./migration/20211028000015-null.js')}.installed`),
-    FileSystem.remove(`${Require.resolve('./migration/20211028000015-null.js')}.uninstalled`),
-    FileSystem.remove(`${Require.resolve('./migration/a/20211027235941-null.js')}.installed`),
-    FileSystem.remove(`${Require.resolve('./migration/a/20211027235941-null.js')}.uninstalled`),
-    FileSystem.remove(`${Require.resolve('./migration/a/b/20211028000056-null.js')}.installed`),
-    FileSystem.remove(`${Require.resolve('./migration/a/b/20211028000056-null.js')}.uninstalled`)
+    FileSystem.remove(`${FolderPath}/migration/1638155586903-null.js.installed`),
+    FileSystem.remove(`${FolderPath}/migration/1638155586903-null.js.uninstalled`),
+    FileSystem.remove(`${FolderPath}/migration/a/1638155600628-null.js.installed`),
+    FileSystem.remove(`${FolderPath}/migration/a/1638155600628-null.js.uninstalled`),
+    FileSystem.remove(`${FolderPath}/migration/a/b/1638155612638-null.js.installed`),
+    FileSystem.remove(`${FolderPath}/migration/a/b/1638155612638-null.js.uninstalled`)
   ])
 })
 
-Test.serial('Migration(\'...\')', (test) => {
+Test.serial('Migration()', (test) => {
   test.notThrows(() => { new NullMigration() })
+})
+
+Test.serial('Migration(\'...\')', (test) => {
+  test.notThrows(() => { new NullMigration(Require.resolve('./migration/1638155586903-null.js')) })
 })
 
 Test.serial('isInstalled() returns false', async (test) => {
@@ -88,7 +90,7 @@ Test.serial('uninstall()', async (test) => {
 
 })
 
-Test.serial('createMigration(name)', async (test) => {
+Test.serial('createMigration(\'...\')', async (test) => {
 
   let name = 'create-migration'
 
@@ -103,7 +105,7 @@ Test.serial('createMigration(name)', async (test) => {
     .filter((file) => Match(file.name, pattern))
     .map((file) => `${folderPath}/${file.name}`)
 
-  // test.log(Path.relative('', path[0]))
+  test.log(Path.relative('', path[0]))
   test.is(path.length, 1)
 
   await FileSystem.remove(path[0])
@@ -116,18 +118,69 @@ Test.serial('getMigration()', (test) => {
     let migration = await Migration.getMigration()
 
     // test.log(migration.map((item) => Path.relative('', item.path)))
-    test.is(migration.length, 4)
-    test.is(migration[0].name, '20211027025141-initial')
-    test.is(migration[1].name, '20211027235941-null')
-    test.is(migration[2].name, '20211028000015-null')
-    test.is(migration[3].name, '20211028000056-null')
+    test.is(migration.length, 3)
+    test.is(migration[0].name, '1638155586903-null')
+    test.is(migration[1].name, '1638155600628-null')
+    test.is(migration[2].name, '1638155612638-null')
+
+  })
+})
+
+Test.serial('getMigration(...)', (test) => {
+  return test.notThrowsAsync(async () => {
+
+    let migration = await Migration.getMigration(1638155600628)
+
+    // test.log(migration.map((item) => Path.relative('', item.path)))
+    test.is(migration.length, 2)
+    test.is(migration[0].name, '1638155600628-null')
+    test.is(migration[1].name, '1638155612638-null')
+
+  })
+})
+
+Test.serial('getMigration(..., ...)', (test) => {
+  return test.notThrowsAsync(async () => {
+
+    let migration = await Migration.getMigration(1638155600628, 1638155600628)
+
+    // test.log(migration.map((item) => Path.relative('', item.path)))
+    test.is(migration.length, 1)
+    test.is(migration[0].name, '1638155600628-null')
+
+  })
+})
+
+Test.serial('getMigration(\'...\')', (test) => {
+  return test.notThrowsAsync(async () => {
+
+    let migration = await Migration.getMigration(Require.resolve('./migration/a/1638155600628-null.js'))
+
+    // test.log(migration.map((item) => Path.relative('', item.path)))
+    test.is(migration.length, 2)
+    test.is(migration[0].name, '1638155600628-null')
+    test.is(migration[1].name, '1638155612638-null')
+
+  })
+})
+
+Test.serial('getMigration(\'...\', \'...\')', (test) => {
+  return test.notThrowsAsync(async () => {
+
+    let migration = await Migration.getMigration(
+      Require.resolve('./migration/a/1638155600628-null.js'),
+      Require.resolve('./migration/a/1638155600628-null.js'))
+
+    // test.log(migration.map((item) => Path.relative('', item.path)))
+    test.is(migration.length, 1)
+    test.is(migration[0].name, '1638155600628-null')
 
   })
 })
 
 Test.serial('importMigration(\'...\')', (test) => {
   return test.notThrowsAsync(async () => {
-    test.is((await Migration.importMigration(Require.resolve('./migration/20211028000015-null.js'))).name, '20211028000015-null')
+    test.is((await Migration.importMigration(Require.resolve('./migration/1638155586903-null.js'))).name, '1638155586903-null')
   })
 })
 
@@ -135,19 +188,66 @@ Test.serial('installMigration()', async (test) => {
 
   await test.notThrowsAsync(Migration.installMigration())
 
-  try {
+  let migration = await Migration.getMigration()
 
-    let migration = await Migration.getMigration()
+  test.is(migration.length, 3)
+  test.is(await migration[0].isInstalled(), true)
+  test.is(await migration[1].isInstalled(), true)
+  test.is(await migration[2].isInstalled(), true)
 
-    test.is(migration.length, 4)
-    test.is(await migration[0].isInstalled(), true)
-    test.is(await migration[1].isInstalled(), true)
-    test.is(await migration[2].isInstalled(), true)
-    test.is(await migration[3].isInstalled(), true)
+})
 
-  } finally {
-    await Migration.uninstallMigration()
-  }
+Test.serial('installMigration(...)', async (test) => {
+
+  await test.notThrowsAsync(Migration.installMigration(1638155600628))
+
+  let migration = await Migration.getMigration()
+
+  test.is(migration.length, 3)
+  test.is(await migration[0].isInstalled(), false)
+  test.is(await migration[1].isInstalled(), true)
+  test.is(await migration[2].isInstalled(), true)
+
+})
+
+Test.serial('installMigration(..., ...)', async (test) => {
+
+  await test.notThrowsAsync(Migration.installMigration(1638155600628, 1638155600628))
+
+  let migration = await Migration.getMigration()
+
+  test.is(migration.length, 3)
+  test.is(await migration[0].isInstalled(), false)
+  test.is(await migration[1].isInstalled(), true)
+  test.is(await migration[2].isInstalled(), false)
+
+})
+
+Test.serial('installMigration(\'...\')', async (test) => {
+
+  await test.notThrowsAsync(Migration.installMigration(Require.resolve('./migration/a/1638155600628-null.js')))
+
+  let migration = await Migration.getMigration()
+
+  test.is(migration.length, 3)
+  test.is(await migration[0].isInstalled(), false)
+  test.is(await migration[1].isInstalled(), true)
+  test.is(await migration[2].isInstalled(), true)
+
+})
+
+Test.serial('installMigration(\'...\', \'...\')', async (test) => {
+
+  await test.notThrowsAsync(Migration.installMigration(
+    Require.resolve('./migration/a/1638155600628-null.js'),
+    Require.resolve('./migration/a/1638155600628-null.js')))
+
+  let migration = await Migration.getMigration()
+
+  test.is(migration.length, 3)
+  test.is(await migration[0].isInstalled(), false)
+  test.is(await migration[1].isInstalled(), true)
+  test.is(await migration[2].isInstalled(), false)
 
 })
 
@@ -158,10 +258,67 @@ Test.serial('uninstallMigration()', async (test) => {
 
   let migration = await Migration.getMigration()
 
-  test.is(migration.length, 4)
+  test.is(migration.length, 3)
   test.is(await migration[0].isInstalled(), false)
   test.is(await migration[1].isInstalled(), false)
   test.is(await migration[2].isInstalled(), false)
-  test.is(await migration[3].isInstalled(), false)
+
+})
+
+Test.serial('uninstallMigration(...)', async (test) => {
+
+  await Migration.installMigration()
+  await test.notThrowsAsync(Migration.uninstallMigration(1638155600628))
+
+  let migration = await Migration.getMigration()
+
+  test.is(migration.length, 3)
+  test.is(await migration[0].isInstalled(), true)
+  test.is(await migration[1].isInstalled(), false)
+  test.is(await migration[2].isInstalled(), false)
+
+})
+
+Test.serial('uninstallMigration(..., ...)', async (test) => {
+
+  await Migration.installMigration()
+  await test.notThrowsAsync(Migration.uninstallMigration(1638155600628, 1638155600628))
+
+  let migration = await Migration.getMigration()
+
+  test.is(migration.length, 3)
+  test.is(await migration[0].isInstalled(), true)
+  test.is(await migration[1].isInstalled(), false)
+  test.is(await migration[2].isInstalled(), true)
+
+})
+
+Test.serial('uninstallMigration(\'...\')', async (test) => {
+
+  await Migration.installMigration()
+  await test.notThrowsAsync(Migration.uninstallMigration(Require.resolve('./migration/a/1638155600628-null.js')))
+
+  let migration = await Migration.getMigration()
+
+  test.is(migration.length, 3)
+  test.is(await migration[0].isInstalled(), true)
+  test.is(await migration[1].isInstalled(), false)
+  test.is(await migration[2].isInstalled(), false)
+
+})
+
+Test.serial('uninstallMigration(\'...\', \'...\')', async (test) => {
+
+  await Migration.installMigration()
+  await test.notThrowsAsync(Migration.uninstallMigration(
+    Require.resolve('./migration/a/1638155600628-null.js'),
+    Require.resolve('./migration/a/1638155600628-null.js')))
+
+  let migration = await Migration.getMigration()
+
+  test.is(migration.length, 3)
+  test.is(await migration[0].isInstalled(), true)
+  test.is(await migration[1].isInstalled(), false)
+  test.is(await migration[2].isInstalled(), true)
 
 })

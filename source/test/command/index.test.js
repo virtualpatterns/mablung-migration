@@ -19,6 +19,17 @@ Test.before(async () => {
   await FileSystem.remove(LogPath)
 })
 
+Test.beforeEach(() => {
+  return Promise.all([
+    FileSystem.remove(`${FolderPath}/migration/1638155412149-null.js.installed`),
+    FileSystem.remove(`${FolderPath}/migration/1638155412149-null.js.uninstalled`),
+    FileSystem.remove(`${FolderPath}/migration/1638327680917-null.js.installed`),
+    FileSystem.remove(`${FolderPath}/migration/1638327680917-null.js.uninstalled`),
+    FileSystem.remove(`${FolderPath}/migration/1638413176994-null.js.installed`),
+    FileSystem.remove(`${FolderPath}/migration/1638413176994-null.js.uninstalled`)
+  ])
+})
+
 Test.serial('default', async (test) => {
   let process = new LoggedProcess(Require.resolve('../../command/index.js'))
   test.is(await process.whenExit(), 1)
@@ -26,10 +37,10 @@ Test.serial('default', async (test) => {
 
 Test.serial('create', async (test) => {
 
-  let name = 'create'
+  let name = 'create-migration'
 
   let process = new LoggedProcess(Require.resolve('../../command/index.js'), {
-    '--migration-class-path': Require.resolve('./migration.js'),
+    '--migration-path': Require.resolve('./migration.js'),
     'create': name
   })
 
@@ -44,19 +55,19 @@ Test.serial('create', async (test) => {
     .filter((file) => Match(file.name, pattern))
     .map((file) => `${folderPath}/${file.name}`)
 
-  // test.log(Path.relative('', path[0]))
+  path.forEach((item) => test.log(Path.relative('', item)))
   test.is(path.length, 1)
 
   await FileSystem.remove(path[0])
 
 })
 
-Test('create throws Error', async (test) => {
+Test.serial('create throws Error', async (test) => {
 
   let name = 'create'
 
   let process = new LoggedProcess(Require.resolve('../../command/index.js'), {
-    '--migration-class-path': `${FolderPath}/error.js`,
+    '--migration-path': `${FolderPath}/error.js`,
     'create': name
   })
 
@@ -67,7 +78,57 @@ Test('create throws Error', async (test) => {
 Test.serial('list', async (test) => {
 
   let process = new LoggedProcess(Require.resolve('../../command/index.js'), {
-    '--migration-class-path': Require.resolve('./migration.js'),
+    '--migration-path': Require.resolve('./migration.js'),
+    'list': true
+  })
+
+  test.is(await process.whenExit(), 0)
+
+})
+
+Test.serial('list --include-from ...', async (test) => {
+
+  let process = new LoggedProcess(Require.resolve('../../command/index.js'), {
+    '--include-from': 1638327680917,
+    '--migration-path': Require.resolve('./migration.js'),
+    'list': true
+  })
+
+  test.is(await process.whenExit(), 0)
+
+})
+
+Test.serial('list --include-from ... --include-to ...', async (test) => {
+
+  let process = new LoggedProcess(Require.resolve('../../command/index.js'), {
+    '--include-from': 1638327680917,
+    '--include-to': 1638327680917,
+    '--migration-path': Require.resolve('./migration.js'),
+    'list': true
+  })
+
+  test.is(await process.whenExit(), 0)
+
+})
+
+Test.serial('list --include-from \'...\'', async (test) => {
+
+  let process = new LoggedProcess(Require.resolve('../../command/index.js'), {
+    '--include-from': Require.resolve('./migration/1638327680917-null.js'),
+    '--migration-path': Require.resolve('./migration.js'),
+    'list': true
+  })
+
+  test.is(await process.whenExit(), 0)
+
+})
+
+Test.serial('list --include-from \'...\' --include-to \'...\'', async (test) => {
+
+  let process = new LoggedProcess(Require.resolve('../../command/index.js'), {
+    '--include-from': Require.resolve('./migration/1638327680917-null.js'),
+    '--include-to': Require.resolve('./migration/1638327680917-null.js'),
+    '--migration-path': Require.resolve('./migration.js'),
     'list': true
   })
 
@@ -78,7 +139,7 @@ Test.serial('list', async (test) => {
 Test.serial('list throws Error', async (test) => {
 
   let process = new LoggedProcess(Require.resolve('../../command/index.js'), {
-    '--migration-class-path': `${FolderPath}/error.js`,
+    '--migration-path': `${FolderPath}/error.js`,
     'list': true
   })
 
@@ -89,23 +150,103 @@ Test.serial('list throws Error', async (test) => {
 Test.serial('install', async (test) => {
 
   let process = new LoggedProcess(Require.resolve('../../command/index.js'), {
-    '--migration-class-path': Require.resolve('./migration.js'),
+    '--migration-path': Require.resolve('./migration.js'),
     'install': true
   })
 
   test.is(await process.whenExit(), 0)
   
-  let migration = await Migration.getMigration(Migration.getRawMigration())
+  let migration = await Migration.getMigration()
 
-  test.is(migration.length, 2)
+  test.is(migration.length, 3)
+  test.is(await migration[0].isInstalled(), true)
   test.is(await migration[1].isInstalled(), true)
+  test.is(await migration[2].isInstalled(), true)
+
+})
+
+Test.serial('install --include-from ...', async (test) => {
+
+  let process = new LoggedProcess(Require.resolve('../../command/index.js'), {
+    '--include-from': 1638327680917,
+    '--migration-path': Require.resolve('./migration.js'),
+    'install': true
+  })
+
+  test.is(await process.whenExit(), 0)
+
+  let migration = await Migration.getMigration()
+
+  test.is(migration.length, 3)
+  test.is(await migration[0].isInstalled(), false)
+  test.is(await migration[1].isInstalled(), true)
+  test.is(await migration[2].isInstalled(), true)
+
+})
+
+Test.serial('install --include-from ... --include-to ...', async (test) => {
+
+  let process = new LoggedProcess(Require.resolve('../../command/index.js'), {
+    '--include-from': 1638327680917,
+    '--include-to': 1638327680917,
+    '--migration-path': Require.resolve('./migration.js'),
+    'install': true
+  })
+
+  test.is(await process.whenExit(), 0)
+
+  let migration = await Migration.getMigration()
+
+  test.is(migration.length, 3)
+  test.is(await migration[0].isInstalled(), false)
+  test.is(await migration[1].isInstalled(), true)
+  test.is(await migration[2].isInstalled(), false)
+
+})
+
+Test.serial('install --include-from \'...\'', async (test) => {
+
+  let process = new LoggedProcess(Require.resolve('../../command/index.js'), {
+    '--include-from': Require.resolve('./migration/1638327680917-null.js'),
+    '--migration-path': Require.resolve('./migration.js'),
+    'install': true
+  })
+
+  test.is(await process.whenExit(), 0)
+
+  let migration = await Migration.getMigration()
+
+  test.is(migration.length, 3)
+  test.is(await migration[0].isInstalled(), false)
+  test.is(await migration[1].isInstalled(), true)
+  test.is(await migration[2].isInstalled(), true)
+
+})
+
+Test.serial('install --include-from \'...\' --include-to \'...\'', async (test) => {
+
+  let process = new LoggedProcess(Require.resolve('../../command/index.js'), {
+    '--include-from': Require.resolve('./migration/1638327680917-null.js'),
+    '--include-to': Require.resolve('./migration/1638327680917-null.js'),
+    '--migration-path': Require.resolve('./migration.js'),
+    'install': true
+  })
+
+  test.is(await process.whenExit(), 0)
+
+  let migration = await Migration.getMigration()
+
+  test.is(migration.length, 3)
+  test.is(await migration[0].isInstalled(), false)
+  test.is(await migration[1].isInstalled(), true)
+  test.is(await migration[2].isInstalled(), false)
 
 })
 
 Test.serial('install throws Error', async (test) => {
 
   let process = new LoggedProcess(Require.resolve('../../command/index.js'), {
-    '--migration-class-path': `${FolderPath}/error.js`,
+    '--migration-path': `${FolderPath}/error.js`,
     'install': true
   })
 
@@ -115,24 +256,149 @@ Test.serial('install throws Error', async (test) => {
 
 Test.serial('uninstall', async (test) => {
 
-  let process = new LoggedProcess(Require.resolve('../../command/index.js'), {
-    '--migration-class-path': Require.resolve('./migration.js'),
+  let process = null
+
+  process = new LoggedProcess(Require.resolve('../../command/index.js'), {
+    '--migration-path': Require.resolve('./migration.js'),
+    'install': true
+  })
+
+  test.is(await process.whenExit(), 0)
+
+  process = new LoggedProcess(Require.resolve('../../command/index.js'), {
+    '--migration-path': Require.resolve('./migration.js'),
     'uninstall': true
   })
 
   test.is(await process.whenExit(), 0)
   
-  let migration = await Migration.getMigration(Migration.getRawMigration())
+  let migration = await Migration.getMigration()
 
-  test.is(migration.length, 2)
+  test.is(migration.length, 3)
+  test.is(await migration[0].isInstalled(), false)
   test.is(await migration[1].isInstalled(), false)
+  test.is(await migration[2].isInstalled(), false)
+
+})
+
+Test.serial('uninstall --include-from ...', async (test) => {
+
+  let process = null
+
+  process = new LoggedProcess(Require.resolve('../../command/index.js'), {
+    '--migration-path': Require.resolve('./migration.js'),
+    'install': true
+  })
+
+  test.is(await process.whenExit(), 0)
+
+  process = new LoggedProcess(Require.resolve('../../command/index.js'), {
+    '--include-from': 1638327680917,
+    '--migration-path': Require.resolve('./migration.js'),
+    'uninstall': true
+  })
+
+  test.is(await process.whenExit(), 0)
+
+  let migration = await Migration.getMigration()
+
+  test.is(migration.length, 3)
+  test.is(await migration[0].isInstalled(), true)
+  test.is(await migration[1].isInstalled(), false)
+  test.is(await migration[2].isInstalled(), false)
+
+})
+
+Test.serial('uninstall --include-from ... --include-to ...', async (test) => {
+
+  let process = null
+
+  process = new LoggedProcess(Require.resolve('../../command/index.js'), {
+    '--migration-path': Require.resolve('./migration.js'),
+    'install': true
+  })
+
+  test.is(await process.whenExit(), 0)
+
+  process = new LoggedProcess(Require.resolve('../../command/index.js'), {
+    '--include-from': 1638327680917,
+    '--include-to': 1638327680917,
+    '--migration-path': Require.resolve('./migration.js'),
+    'uninstall': true
+  })
+
+  test.is(await process.whenExit(), 0)
+
+  let migration = await Migration.getMigration()
+
+  test.is(migration.length, 3)
+  test.is(await migration[0].isInstalled(), true)
+  test.is(await migration[1].isInstalled(), false)
+  test.is(await migration[2].isInstalled(), true)
+
+})
+
+Test.serial('uninstall --include-from \'...\'', async (test) => {
+
+  let process = null
+
+  process = new LoggedProcess(Require.resolve('../../command/index.js'), {
+    '--migration-path': Require.resolve('./migration.js'),
+    'install': true
+  })
+
+  test.is(await process.whenExit(), 0)
+
+  process = new LoggedProcess(Require.resolve('../../command/index.js'), {
+    '--include-from': Require.resolve('./migration/1638327680917-null.js'),
+    '--migration-path': Require.resolve('./migration.js'),
+    'uninstall': true
+  })
+
+  test.is(await process.whenExit(), 0)
+
+  let migration = await Migration.getMigration()
+
+  test.is(migration.length, 3)
+  test.is(await migration[0].isInstalled(), true)
+  test.is(await migration[1].isInstalled(), false)
+  test.is(await migration[2].isInstalled(), false)
+
+})
+
+Test.serial('uninstall --include-from \'...\' --include-to \'...\'', async (test) => {
+
+  let process = null
+
+  process = new LoggedProcess(Require.resolve('../../command/index.js'), {
+    '--migration-path': Require.resolve('./migration.js'),
+    'install': true
+  })
+
+  test.is(await process.whenExit(), 0)
+
+  process = new LoggedProcess(Require.resolve('../../command/index.js'), {
+    '--include-from': Require.resolve('./migration/1638327680917-null.js'),
+    '--include-to': Require.resolve('./migration/1638327680917-null.js'),
+    '--migration-path': Require.resolve('./migration.js'),
+    'uninstall': true
+  })
+
+  test.is(await process.whenExit(), 0)
+
+  let migration = await Migration.getMigration()
+
+  test.is(migration.length, 3)
+  test.is(await migration[0].isInstalled(), true)
+  test.is(await migration[1].isInstalled(), false)
+  test.is(await migration[2].isInstalled(), true)
 
 })
 
 Test.serial('uninstall throws Error', async (test) => {
 
   let process = new LoggedProcess(Require.resolve('../../command/index.js'), {
-    '--migration-class-path': `${FolderPath}/error.js`,
+    '--migration-path': `${FolderPath}/error.js`,
     'uninstall': true
   })
 

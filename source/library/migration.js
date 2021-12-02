@@ -1,5 +1,4 @@
 import { FileSystem } from '@virtualpatterns/mablung-file-system'
-import { DateTime } from 'luxon'
 import Is from '@pwn/is'
 import Match from 'minimatch'
 import Path from 'path'
@@ -44,7 +43,7 @@ class Migration {
     let fromPath = templatePath
 
     let toFolder = path
-    let toName = `${DateTime.utc().toFormat('yyyyLLddHHmmss')}-${name}`
+    let toName = `${Date.now()}-${name}` // `${DateTime.utc().toFormat('yyyyLLddHHmmss')}-${name}`
     let toExtension = Path.extname(templatePath)
 
     let toPath = `${toFolder}/${toName}${toExtension}`
@@ -56,26 +55,68 @@ class Migration {
 
   }
 
-  static async getMigration(...argument) {
-    return (await Promise.all(this.getRawMigration(...argument))).sort((leftMigration, rightMigration) => leftMigration.name.localeCompare(rightMigration.name))
+  static async getMigration(includeFrom = Number.MIN_SAFE_INTEGER, includeTo = Number.MAX_SAFE_INTEGER, ...argument) {
+    return (await Promise.all(this.getRawMigration(includeFrom, includeTo, ...argument))).sort((leftMigration, rightMigration) => leftMigration.name.localeCompare(rightMigration.name))
   }
 
-  static getRawMigration(...argument) {
-    return this.getRawMigrationFromPath(`${FolderPath}/migration`, [ '*.js' ], [ 'template.js' ], ...argument)
+  static getRawMigration(includeFrom, includeTo, ...argument) {
+    return this.getRawMigrationFromPath(`${FolderPath}/migration`, [ '*.js' ], [ 'template.js' ], includeFrom, includeTo, ...argument)
   }
 
-  static getRawMigrationFromPath(path, includePattern, excludePattern, ...argument) {
+  static getRawMigrationFromPath(path, includePattern, excludePattern, includeFrom, includeTo, ...argument) {
+
+    let namePattern = /^(\d+?)-.+$/im
+
+    if (Is.string(includeFrom)) {
+
+      let nameFrom = Path.basename(includeFrom, Path.extname(includeFrom))
+
+      if (namePattern.test(nameFrom)) {
+        let [, match] = nameFrom.match(namePattern)
+        includeFrom = parseInt(match)
+      } else {
+        includeFrom = Number.MIN_SAFE_INTEGER
+      }
+
+    }
+
+    if (Is.string(includeTo)) {
+
+      let nameTo = Path.basename(includeTo, Path.extname(includeTo))
+
+      if (namePattern.test(nameTo)) {
+        let [, match] = nameTo.match(namePattern)
+        includeTo = parseInt(match)
+      } else {
+        includeTo = Number.MIN_SAFE_INTEGER
+      }
+
+    }
 
     let item = FileSystem.readdirSync(path, { 'encoding': 'utf-8', 'withFileTypes': true })
 
     let getRawMigrationFromPath = item
       .filter((item) => item.isDirectory())
-      .map((directory) => this.getRawMigrationFromPath(`${path}/${directory.name}`, includePattern, excludePattern, ...argument))
+      .map((directory) => this.getRawMigrationFromPath(`${path}/${directory.name}`, includePattern, excludePattern, includeFrom, includeTo, ...argument))
 
     let importMigration = item
       .filter((item) => item.isFile())
       .filter((file) => includePattern.reduce((isMatch, pattern) => isMatch ? isMatch : Match(file.name, pattern), false))
       .filter((file) => !excludePattern.reduce((isMatch, pattern) => isMatch ? isMatch : Match(file.name, pattern), false))
+      .filter((file) => {
+
+        if (namePattern.test(file.name)) {
+
+          let [, match] = file.name.match(namePattern)
+          let filterAt = parseInt(match)
+
+          return includeFrom <= filterAt && filterAt <= includeTo
+
+        } else {
+          return false
+        }
+
+      })
       .map((file) => this.importMigration(`${path}/${file.name}`, ...argument))
 
     return [ ...getRawMigrationFromPath, ...importMigration ].flat()
@@ -92,30 +133,32 @@ class Migration {
     
   }
 
-  static async installMigration(...argument) {
+  static async installMigration(includeFrom = Number.MIN_SAFE_INTEGER, includeTo = Number.MAX_SAFE_INTEGER, ...argument) {
 
-    let migration = await this.getMigration(...argument)
+    let migration = await this.getMigration(includeFrom, includeTo, ...argument)
+    let isNotInstalled = await Promise.all(migration.map((migration) => migration.isNotInstalled()))
+
+    migration = isNotInstalled
+      .filter((isNotInstalled) => isNotInstalled)
+      .map((isNotInstalled, index) => migration[index])
 
     for (let item of migration) {
-
-      if (await item.isNotInstalled()) {
-        await item.install()
-      }
-
+      await item.install()
     }
 
   }
 
-  static async uninstallMigration(...argument) {
+  static async uninstallMigration(includeFrom = Number.MIN_SAFE_INTEGER, includeTo = Number.MAX_SAFE_INTEGER, ...argument) {
 
-    let migration = await this.getMigration(...argument)
+    let migration = await this.getMigration(includeFrom, includeTo, ...argument)
+    let isInstalled = await Promise.all(migration.map((migration) => migration.isInstalled()))
+
+    migration = isInstalled
+      .filter((isInstalled) => isInstalled)
+      .map((isInstalled, index) => migration[index])
 
     for (let item of migration.reverse()) {
-
-      if (await item.isInstalled()) {
-        await item.uninstall()
-      }
-
+      await item.uninstall()
     }
 
   }

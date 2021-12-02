@@ -9,20 +9,30 @@ import { Package } from '../library/package.js'
 
 const Process = process
 
-async function importMigration(path) {
-
-  let Migration = null
-  Migration = await import(path)
-  Migration = Migration.Migration || Migration
-
-  return Migration
-  
-}
-
 Command
   .name(Package.name.replace(/^(.*)\/(.*)$/, '$2'))
   .version(Package.version)
-  .option('--migration-class-path <path>', 'Path of the migration class to import', 'release/library/migration.js')
+  .option('--include-from <from>', 'Used by the list, install, and uninstall commands, defines the first migration to consider', (value) => {
+
+    switch (true) {
+      case /^\d+?$/.test(value):
+        return parseInt(value)
+      default:
+        return Path.resolve(value)
+    }
+
+  }, Number.MIN_SAFE_INTEGER)
+  .option('--include-to <to>', 'Used by the list, install, and uninstall commands, defines the last migration to consider', (value) => {
+
+    switch (true) {
+      case /^\d+?$/.test(value):
+        return parseInt(value)
+      default:
+        return Path.resolve(value)
+    }
+
+  }, Number.MAX_SAFE_INTEGER)
+  .option('--migration-path <path>', 'Path of the migration to import', (value) => Path.resolve(value), './release/library/migration.js')
 
 Command
   .command('create <name>')
@@ -33,7 +43,9 @@ Command
 
     try {
 
-      const Migration = await importMigration(Path.resolve(Command.opts().migrationClassPath))
+      const option = Command.opts()
+
+      const { Migration } = await import(option.migrationPath)
 
       let path = await Migration.createMigration(name)
 
@@ -49,15 +61,17 @@ Command
 Command
   .command('list [argument...]')
   .description('List all known migrations')
-  .action(async (argument) => {
+  .action(async(argument) => {
 
     Process.exitCode = 0
 
     try {
 
-      const Migration = await importMigration(Path.resolve(Command.opts().migrationClassPath))
-      
-      let migration = await Migration.getMigration(...argument)
+      const option = Command.opts()
+
+      const { Migration } = await import(option.migrationPath)
+
+      let migration = await Migration.getMigration(option.includeFrom, option.includeTo, ...argument)
 
       for (let item of migration) {
         console.log(`'${Path.relative('', item.path)}' is ${(await item.isInstalled()) ? '' : 'NOT '}installed`)
@@ -79,9 +93,11 @@ Command
 
     try {
 
-      const Migration = await importMigration(Path.resolve(Command.opts().migrationClassPath))
-      
-      await Migration.installMigration(...argument)
+      const option = Command.opts()
+
+      const { Migration } = await import(option.migrationPath)
+
+      await Migration.installMigration(option.includeFrom, option.includeTo, ...argument)
 
     } catch (error) {
       Process.exitCode = 1
@@ -99,9 +115,11 @@ Command
 
     try {
 
-      const Migration = await importMigration(Path.resolve(Command.opts().migrationClassPath))
-      
-      await Migration.uninstallMigration(...argument)
+      const option = Command.opts()
+
+      const { Migration } = await import(option.migrationPath)
+
+      await Migration.uninstallMigration(option.includeFrom, option.includeTo, ...argument)
 
     } catch (error) {
       Process.exitCode = 1
