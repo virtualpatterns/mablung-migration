@@ -1,4 +1,5 @@
 import { FileSystem } from '@virtualpatterns/mablung-file-system'
+import EventEmitter from 'events'
 import Is from '@pwn/is'
 import Match from 'minimatch'
 import Path from 'path'
@@ -7,6 +8,8 @@ const FilePath = __filePath
 const FolderPath = Path.dirname(FilePath)
 
 class Migration {
+  
+  static eventEmitter = new EventEmitter()
 
   constructor(path = FilePath) {
     this.path = path
@@ -143,6 +146,7 @@ class Migration {
       .map((isNotInstalled, index) => migration[index])
 
     for (let item of migration) {
+      this.emit('install', item)
       await item.install()
     }
 
@@ -158,11 +162,22 @@ class Migration {
       .map((isInstalled, index) => migration[index])
 
     for (let item of migration.reverse()) {
+      this.emit('uninstall', item)
       await item.uninstall()
     }
 
   }
 
 }
+
+[
+  'on',
+  'off',
+  'emit'
+].forEach((methodName) => {
+  Migration[methodName] = function (...argument) {
+    this.eventEmitter[methodName](...argument)
+  }
+})
 
 export { Migration }

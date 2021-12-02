@@ -43,7 +43,7 @@ Command
 
     try {
 
-      const option = Command.opts()
+      let option = Command.opts()
 
       const { Migration } = await import(option.migrationPath)
 
@@ -67,7 +67,7 @@ Command
 
     try {
 
-      const option = Command.opts()
+      let option = Command.opts()
 
       const { Migration } = await import(option.migrationPath)
 
@@ -93,11 +93,19 @@ Command
 
     try {
 
-      const option = Command.opts()
+      let option = Command.opts()
+      let onInstallHandler = null
 
       const { Migration } = await import(option.migrationPath)
 
+      Migration.on('install', onInstallHandler = (migration) => {
+        console.log(`Installing '${Path.relative('', migration.path)}' ...`)
+      })
+
       await Migration.installMigration(option.includeFrom, option.includeTo, ...argument)
+
+      Migration.off('install', onInstallHandler)
+      onInstallHandler = null
 
     } catch (error) {
       Process.exitCode = 1
@@ -115,11 +123,19 @@ Command
 
     try {
 
-      const option = Command.opts()
+      let option = Command.opts()
+      let onUnInstallHandler = null
 
       const { Migration } = await import(option.migrationPath)
 
+      Migration.on('uninstall', onUnInstallHandler = (migration) => {
+        console.log(`Uninstalling '${Path.relative('', migration.path)}' ...`)
+      })
+
       await Migration.uninstallMigration(option.includeFrom, option.includeTo, ...argument)
+
+      Migration.off('uninstall', onUnInstallHandler)
+      onUnInstallHandler = null
 
     } catch (error) {
       Process.exitCode = 1
