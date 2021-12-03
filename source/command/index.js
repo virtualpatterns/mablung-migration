@@ -32,7 +32,7 @@ Command
     }
 
   }, Number.MAX_SAFE_INTEGER)
-  .option('--migration-path <path>', 'Path of the migration to import', (value) => Path.resolve(value), './release/library/migration.js')
+  .option('--migration-path <path>', 'Path of the migration to import', 'release/library/migration.js')
 
 Command
   .command('create <name>')
@@ -45,7 +45,7 @@ Command
 
       let option = Command.opts()
 
-      const { Migration } = await import(option.migrationPath)
+      const { Migration } = await import(Path.resolve(option.migrationPath))
 
       let path = await Migration.createMigration(name)
 
@@ -69,7 +69,7 @@ Command
 
       let option = Command.opts()
 
-      const { Migration } = await import(option.migrationPath)
+      const { Migration } = await import(Path.resolve(option.migrationPath))
 
       let migration = await Migration.getMigration(option.includeFrom, option.includeTo, ...argument)
 
@@ -96,7 +96,7 @@ Command
       let option = Command.opts()
       let onInstallHandler = null
 
-      const { Migration } = await import(option.migrationPath)
+      const { Migration } = await import(Path.resolve(option.migrationPath))
 
       Migration.on('install', onInstallHandler = (migration) => {
         console.log(`Installing '${Path.relative('', migration.path)}' ...`)
@@ -126,7 +126,7 @@ Command
       let option = Command.opts()
       let onUnInstallHandler = null
 
-      const { Migration } = await import(option.migrationPath)
+      const { Migration } = await import(Path.resolve(option.migrationPath))
 
       Migration.on('uninstall', onUnInstallHandler = (migration) => {
         console.log(`Uninstalling '${Path.relative('', migration.path)}' ...`)
