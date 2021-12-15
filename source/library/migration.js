@@ -13,21 +13,27 @@ class Migration {
 
   constructor(path = FilePath) {
     this.path = path
+    this.name = Path.basename(this.path, Path.extname(this.path))
   }
 
-  get name() {
-    return Path.basename(this.path, Path.extname(this.path))
-  }
+  // async isInstalled() {
+  //   return Is.deepEqual(await Promise.all([
+  //     FileSystem.pathExists(`${this.path}.installed`),
+  //     FileSystem.pathExists(`${this.path}.uninstalled`)
+  //   ]), [ true, false ])
+  // }
 
   async isInstalled() {
-    return Is.deepEqual(await Promise.all([
+    return Promise.all([
       FileSystem.pathExists(`${this.path}.installed`),
       FileSystem.pathExists(`${this.path}.uninstalled`)
-    ]), [ true, false ])
+    ])
+      .then((value) => Is.deepEqual(value, [true, false]))
   }
 
   async isNotInstalled() {
-    return !(await this.isInstalled())
+    return this.isInstalled()
+      .then((value) => !value)
   }
 
   install() {
