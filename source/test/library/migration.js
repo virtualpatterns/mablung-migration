@@ -1,5 +1,7 @@
-import { CreateMigration, Migration as BaseMigration } from '@virtualpatterns/mablung-migration'
+import { CreateMigration } from '@virtualpatterns/mablung-migration'
 import Path from 'path'
+
+import { Migration as BaseMigration } from '../migration.js'
 
 const FilePath = __filePath
 const FolderPath = Path.dirname(FilePath)

@@ -16,43 +16,26 @@ class Migration {
     this.name = Path.basename(this.path, Path.extname(this.path))
   }
 
-  // async isInstalled() {
-  //   return Is.deepEqual(await Promise.all([
-  //     FileSystem.pathExists(`${this.path}.installed`),
-  //     FileSystem.pathExists(`${this.path}.uninstalled`)
-  //   ]), [ true, false ])
-  // }
-
-  async isInstalled() {
-    return Promise.all([
-      FileSystem.pathExists(`${this.path}.installed`),
-      FileSystem.pathExists(`${this.path}.uninstalled`)
-    ])
-      .then((value) => Is.deepEqual(value, [true, false]))
-  }
+  // derived class must implement ...
+  // async isInstalled() {}
 
   async isNotInstalled() {
     return this.isInstalled()
       .then((value) => !value)
   }
 
-  install() {
-    return Promise.all([
-      FileSystem.touch(`${this.path}.installed`),
-      FileSystem.remove(`${this.path}.uninstalled`)
-    ])
-  }
+  // derived class must implement ...
+  // async install() {}
 
-  uninstall() {
-    return FileSystem.touch(`${this.path}.uninstalled`)
-  }
+  // derived class must implement ...
+  // async uninstall() {}
 
   static async createMigration(name, path = Path.normalize(`${FolderPath}/../../source/library/migration`), templatePath = Path.normalize(`${FolderPath}/../../source/library/migration/template.js`)) {
 
     let fromPath = templatePath
 
     let toFolder = path
-    let toName = `${Date.now()}-${name}` // `${DateTime.utc().toFormat('yyyyLLddHHmmss')}-${name}`
+    let toName = `${Date.now()}-${name}`
     let toExtension = Path.extname(templatePath)
 
     let toPath = `${toFolder}/${toName}${toExtension}`
@@ -138,7 +121,7 @@ class Migration {
     Migration = await import(path)
     Migration = Migration.Migration || Migration
 
-    return new Migration(path, ...argument)
+    return new Migration(...argument)
     
   }
 
