@@ -23,8 +23,7 @@
     "@pwn/is": "^1.0.2",
     "@virtualpatterns/mablung-file-system": "0.0.2-28",
     "@virtualpatterns/mablung-source-map-support": "0.0.26-46",
-    "commander": "^8.3.0",
-    "minimatch": "^3.0.4"
+    "commander": "^8.3.0"
   },
   "devDependencies": {
     "@virtualpatterns/babel-preset-mablung-makefile-environment": "0.0.26-13",
@@ -32,6 +31,7 @@
     "@virtualpatterns/mablung-check-dependency": "0.0.26-41",
     "@virtualpatterns/mablung-makefile-environment": "0.0.26-35",
     "@virtualpatterns/mablung-worker": "0.0.2-106",
-    "ava": "^3.15.0"
+    "ava": "^3.15.0",
+    "minimatch": "^3.0.4"
   }
 }
