@@ -1,7 +1,6 @@
 import { FileSystem } from '@virtualpatterns/mablung-file-system'
 import EventEmitter from 'events'
 import Is from '@pwn/is'
-import Match from 'minimatch'
 import Path from 'path'
 
 const FilePath = __filePath
@@ -55,7 +54,7 @@ class Migration {
   }
 
   static getRawMigration(includeFrom, includeTo, ...argument) {
-    return this.getRawMigrationFromPath(`${FolderPath}/migration`, /* [ '*.js' ], [ 'template.js' ], */ includeFrom, includeTo, ...argument)
+    return this.getRawMigrationFromPath(`${FolderPath}/migration`, includeFrom, includeTo, ...argument)
   }
 
   static getRawMigrationFromPath(path, /* includePattern, excludePattern, */ includeFrom, includeTo, ...argument) {
@@ -96,8 +95,6 @@ class Migration {
 
     let rawMigration = item
       .filter((item) => item.isFile())
-      // .filter((file) => includePattern.reduce((isMatch, pattern) => isMatch ? isMatch : Match(file.name, pattern), false))
-      // .filter((file) => !excludePattern.reduce((isMatch, pattern) => isMatch ? isMatch : Match(file.name, pattern), false))
       .filter((file) => {
 
         if (namePattern.test(file.name)) {
