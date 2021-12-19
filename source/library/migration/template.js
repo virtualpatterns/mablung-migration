@@ -8,13 +8,11 @@ class Migration extends BaseMigration {
     super(FilePath)
   }
 
-  install() {
-    return super.install()
-  }
+  async isInstalled() {}
 
-  uninstall() {
-    return super.uninstall()
-  }
+  async install() {}
+
+  async uninstall() {}
 
 }
 

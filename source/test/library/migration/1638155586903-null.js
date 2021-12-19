@@ -4,8 +4,8 @@ const FilePath = __filePath
 
 class Migration extends BaseMigration {
 
-  constructor() {
-    super(FilePath)
+  constructor(installPath) {
+    super(FilePath, installPath)
   }
 
 }

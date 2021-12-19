@@ -9,25 +9,19 @@ const FolderPath = Path.dirname(FilePath)
 
 class Migration {
   
+  static defaultFrom = undefined
+  static defaultTo = undefined
+
   static eventEmitter = new EventEmitter()
 
-  constructor(path = FilePath) {
+  constructor(path) {
     this.path = path
     this.name = Path.basename(this.path, Path.extname(this.path))
   }
 
   // derived class must implement ...
   // async isInstalled() {}
-
-  async isNotInstalled() {
-    return this.isInstalled()
-      .then((value) => !value)
-  }
-
-  // derived class must implement ...
   // async install() {}
-
-  // derived class must implement ...
   // async uninstall() {}
 
   static async createMigration(name, path = Path.normalize(`${FolderPath}/../../source/library/migration`), templatePath = Path.normalize(`${FolderPath}/../../source/library/migration/template.js`)) {
@@ -48,20 +42,29 @@ class Migration {
   }
 
   static async getMigration(includeFrom = Number.MIN_SAFE_INTEGER, includeTo = Number.MAX_SAFE_INTEGER, ...argument) {
-    return (await Promise.all(this.getRawMigration(includeFrom, includeTo, ...argument))).sort((leftMigration, rightMigration) => leftMigration.name.localeCompare(rightMigration.name))
+
+    let rawMigration = null
+    rawMigration = this.getRawMigration(includeFrom, includeTo, ...argument)
+
+    let migration = null
+    migration = await Promise.all(rawMigration)
+    migration = migration.sort((leftMigration, rightMigration) => leftMigration.name.localeCompare(rightMigration.name))
+
+    return migration
+
   }
 
   static getRawMigration(includeFrom, includeTo, ...argument) {
-    return this.getRawMigrationFromPath(`${FolderPath}/migration`, [ '*.js' ], [ 'template.js' ], includeFrom, includeTo, ...argument)
+    return this.getRawMigrationFromPath(`${FolderPath}/migration`, /* [ '*.js' ], [ 'template.js' ], */ includeFrom, includeTo, ...argument)
   }
 
-  static getRawMigrationFromPath(path, includePattern, excludePattern, includeFrom, includeTo, ...argument) {
+  static getRawMigrationFromPath(path, /* includePattern, excludePattern, */ includeFrom, includeTo, ...argument) {
 
-    let namePattern = /^(\d+?)-.+$/im
+    let namePattern = /^(\d+?)-.+?\.c?js$/im
 
     if (Is.string(includeFrom)) {
 
-      let nameFrom = Path.basename(includeFrom, Path.extname(includeFrom))
+      let nameFrom = Path.basename(includeFrom) // , Path.extname(includeFrom))
 
       if (namePattern.test(nameFrom)) {
         let [, match] = nameFrom.match(namePattern)
@@ -74,27 +77,27 @@ class Migration {
 
     if (Is.string(includeTo)) {
 
-      let nameTo = Path.basename(includeTo, Path.extname(includeTo))
+      let nameTo = Path.basename(includeTo) // , Path.extname(includeTo))
 
       if (namePattern.test(nameTo)) {
         let [, match] = nameTo.match(namePattern)
         includeTo = parseInt(match)
       } else {
-        includeTo = Number.MIN_SAFE_INTEGER
+        includeTo = Number.MAX_SAFE_INTEGER
       }
 
     }
 
     let item = FileSystem.readdirSync(path, { 'encoding': 'utf-8', 'withFileTypes': true })
 
-    let getRawMigrationFromPath = item
+    let rawMigrationFromPath = item
       .filter((item) => item.isDirectory())
-      .map((directory) => this.getRawMigrationFromPath(`${path}/${directory.name}`, includePattern, excludePattern, includeFrom, includeTo, ...argument))
+      .map((directory) => this.getRawMigrationFromPath(`${path}/${directory.name}`, /* includePattern, excludePattern,  */ includeFrom, includeTo, ...argument))
 
-    let importMigration = item
+    let rawMigration = item
       .filter((item) => item.isFile())
-      .filter((file) => includePattern.reduce((isMatch, pattern) => isMatch ? isMatch : Match(file.name, pattern), false))
-      .filter((file) => !excludePattern.reduce((isMatch, pattern) => isMatch ? isMatch : Match(file.name, pattern), false))
+      // .filter((file) => includePattern.reduce((isMatch, pattern) => isMatch ? isMatch : Match(file.name, pattern), false))
+      // .filter((file) => !excludePattern.reduce((isMatch, pattern) => isMatch ? isMatch : Match(file.name, pattern), false))
       .filter((file) => {
 
         if (namePattern.test(file.name)) {
@@ -111,7 +114,7 @@ class Migration {
       })
       .map((file) => this.importMigration(`${path}/${file.name}`, ...argument))
 
-    return [ ...getRawMigrationFromPath, ...importMigration ].flat()
+    return [ ...rawMigrationFromPath, ...rawMigration ].flat()
 
   }
 
@@ -128,11 +131,11 @@ class Migration {
   static async installMigration(includeFrom = Number.MIN_SAFE_INTEGER, includeTo = Number.MAX_SAFE_INTEGER, ...argument) {
 
     let migration = await this.getMigration(includeFrom, includeTo, ...argument)
-    let isNotInstalled = await Promise.all(migration.map((migration) => migration.isNotInstalled()))
+    let isInstalled = await Promise.all(migration.map((migration) => migration.isInstalled()))
 
-    migration = isNotInstalled
-      .filter((isNotInstalled) => isNotInstalled)
-      .map((isNotInstalled, index) => migration[index])
+    migration = isInstalled
+      .filter((isInstalled) => !isInstalled)
+      .map((isInstalled, index) => migration[index])
 
     for (let item of migration) {
       this.emit('install', item)
