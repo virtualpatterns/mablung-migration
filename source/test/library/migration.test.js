@@ -188,6 +188,24 @@ Test.serial('getMigration(default, \'...\')', (test) => {
   })
 })
 
+Test.serial('getMigration(template, template)', (test) => {
+  return test.notThrowsAsync(async () => {
+
+    let migration = await Migration.getMigration(
+      Require.resolve('../../library/migration/template.js'),
+      Require.resolve('../../library/migration/template.js'),
+      InstallPath
+    )
+
+    // test.log(migration.map((item) => Path.relative('', item.path)))
+    test.is(migration.length, 3)
+    test.is(migration[0].name, '1638155586903-null')
+    test.is(migration[1].name, '1638155600628-null')
+    test.is(migration[2].name, '1638155612638-null')
+
+  })
+})
+
 Test.serial('installMigration(defaut, default)', async (test) => {
 
   await test.notThrowsAsync(Migration.installMigration(Migration.defaultFrom, Migration.defaultTo, InstallPath))
