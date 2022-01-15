@@ -1,19 +1,16 @@
-import { Migration as BaseMigration } from '../migration.js'
+import { Migration } from '../migration.js'
 
 const FilePath = __filePath
 
-class Migration extends BaseMigration {
+export default class extends Migration {
 
-  constructor() {
-    super(FilePath)
+  constructor(option) {
+    super(FilePath, option)
   }
 
-  async isInstalled() {}
-
-  async install() {}
-
-  async uninstall() {}
+  // must implement directly or through inheritance ...
+  // async isInstalled() {}
+  // async install() {}
+  // async uninstall() {}
 
 }
-
-export { Migration }

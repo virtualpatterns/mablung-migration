@@ -1,0 +1,6 @@
+{
+  "migration": {
+    "name": "IsInstalledErrorMigration",
+    "path": "./release/test/library/is-installed-error-migration.js"
+  }
+}

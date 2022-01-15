@@ -1,0 +1,6 @@
+{
+  "migration": {
+    "name": "UnInstallErrorMigration",
+    "path": "./release/test/library/uninstall-error-migration.js"
+  }
+}

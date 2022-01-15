@@ -1,0 +1,9 @@
+{
+  "migration": {
+    "name": "NullMigration",
+    "path": "./release/test/library/null-migration.js"
+  },
+  "install": {
+    "path": "./data/test/command/null-migration"
+  }
+}

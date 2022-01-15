@@ -1,5 +1,5 @@
 
-export function CreateMigration(migrationClass, defaultSourceMigrationPath, defaultSourceTemplatePath, defaultReleaseMigrationPath/*, defaultIncludePattern = [ '*.js' ], defaultExcludePattern = [ 'template.js' ] */) {
+export function CreateMigration(migrationClass, defaultReleaseMigrationPath, defaultSourceMigrationPath = defaultReleaseMigrationPath.replace('/release/', '/source/'), defaultSourceTemplatePath) {
  
   class Migration extends migrationClass {
 
@@ -11,8 +11,8 @@ export function CreateMigration(migrationClass, defaultSourceMigrationPath, defa
       return super.createMigration(name, migrationPath, templatePath)
     }
 
-    static getRawMigration(...argument) {
-      return [...super.getRawMigration(...argument), ...super.getRawMigrationFromPath(defaultReleaseMigrationPath, /* defaultIncludePattern, defaultExcludePattern, */ ...argument)  ]
+    static getRawMigration(option) {
+      return [ ...super.getRawMigration(option), ...super.getRawMigrationFromPath(defaultReleaseMigrationPath, option) ]
     }
 
   }

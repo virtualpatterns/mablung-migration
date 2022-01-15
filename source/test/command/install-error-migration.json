@@ -1,0 +1,6 @@
+{
+  "migration": {
+    "name": "InstallErrorMigration",
+    "path": "./release/test/library/install-error-migration.js"
+  }
+}

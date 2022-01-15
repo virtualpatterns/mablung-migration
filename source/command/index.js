@@ -5,34 +5,15 @@ import '@virtualpatterns/mablung-source-map-support/install'
 import Command from 'commander'
 import Path from 'path'
 
-import { Package } from '../library/package.js'
+import { LoadConfiguration } from './library/load-configuration.js'
+import { Package } from './library/package.js'
 
 const Process = process
 
 Command
   .name(Package.name.replace(/^(.*)\/(.*)$/, '$2'))
   .version(Package.version)
-  .option('--include-from <from>', 'Used by the list, install, and uninstall commands, defines the first migration to consider', (value) => {
-
-    switch (true) {
-      case /^\d+?$/.test(value):
-        return parseInt(value)
-      default:
-        return Path.resolve(value)
-    }
-
-  }, Number.MIN_SAFE_INTEGER)
-  .option('--include-to <to>', 'Used by the list, install, and uninstall commands, defines the last migration to consider', (value) => {
-
-    switch (true) {
-      case /^\d+?$/.test(value):
-        return parseInt(value)
-      default:
-        return Path.resolve(value)
-    }
-
-  }, Number.MAX_SAFE_INTEGER)
-  .option('--migration-path <path>', 'Path of the migration to import', 'release/library/migration.js')
+  .option('--configuration-path <path>', 'Path of the configuration file (default: "./migration.cjs", "./migration.js", or "./migration.json")')
 
 Command
   .command('create <name>')
@@ -43,9 +24,11 @@ Command
 
     try {
 
-      let option = Command.opts()
+      let configuration = await LoadConfiguration(Command.opts().configurationPath)
+      console.log(`Loaded '${Path.relative('', configuration.path)}'`)
 
-      const { Migration } = await import(Path.resolve(option.migrationPath))
+      let { [configuration.migration.name]: Migration } = await import(Path.resolve(configuration.migration.path))
+      console.log(`Imported '${configuration.migration.name}' from '${Path.relative('', configuration.migration.path)}'`)
 
       let path = await Migration.createMigration(name)
 
@@ -59,23 +42,33 @@ Command
   })
 
 Command
-  .command('list [argument...]')
+  .command('list')
   .description('List all known migrations')
-  .action(async(argument) => {
+  .action(async () => {
 
     Process.exitCode = 0
 
     try {
 
-      let option = Command.opts()
+      let configuration = await LoadConfiguration(Command.opts().configurationPath)
+      console.log(`Loaded '${Path.relative('', configuration.path)}'`)
 
-      const { Migration } = await import(Path.resolve(option.migrationPath))
+      let { [configuration.migration.name]: Migration } = await import(Path.resolve(configuration.migration.path))
+      console.log(`Imported '${configuration.migration.name}' from '${Path.relative('', configuration.migration.path)}'`)
 
-      let migration = await Migration.getMigration(option.includeFrom, option.includeTo, ...argument)
+      Migration.onMigration(async (migration) => {
 
-      for (let item of migration) {
-        console.log(`'${Path.relative('', item.path)}' is ${(await item.isInstalled()) ? '' : 'NOT '}installed`)
-      }
+        Process.stdout.write(`Checking '${Path.relative('', migration.path)}' ...`)
+
+        try {
+          let isInstalled = await migration.isInstalled()
+          Process.stdout.write(` is ${isInstalled ? '' : 'not '}installed\n`)
+        } catch (error) {
+          Process.stdout.write(' error\n')
+          throw error
+        }
+
+      }, configuration)
       
     } catch (error) {
       Process.exitCode = 1
@@ -85,27 +78,63 @@ Command
   })
 
 Command
-  .command('install [argument...]')
-  .description('Install uninstalled migrations')
-  .action(async (argument) => {
+  .command('install')
+  .description('Install not-installed migrations')
+  .action(async () => {
 
     Process.exitCode = 0
 
     try {
 
-      let option = Command.opts()
-      let onInstallHandler = null
+      let configuration = await LoadConfiguration(Command.opts().configurationPath)
+      console.log(`Loaded '${Path.relative('', configuration.path)}'`)
 
-      const { Migration } = await import(Path.resolve(option.migrationPath))
+      let { [configuration.migration.name]: Migration } = await import(Path.resolve(configuration.migration.path))
+      console.log(`Imported '${configuration.migration.name}' from '${Path.relative('', configuration.migration.path)}'`)
 
-      Migration.on('install', onInstallHandler = (migration) => {
-        console.log(`Installing '${Path.relative('', migration.path)}' ...`)
-      })
+      // let onInstallHandler = {}
 
-      await Migration.installMigration(option.includeFrom, option.includeTo, ...argument)
+      // Migration.on('preInstall', onInstallHandler.preInstall = (migration) => {
+      //   Process.stdout.write(`Installing '${Path.relative('', migration.path)}' ...`)
+      // })
 
-      Migration.off('install', onInstallHandler)
-      onInstallHandler = null
+      // try {
+
+      //   Migration.on('postInstall', onInstallHandler.postInstall = (migration, error) => {
+
+      //     if (Is.undefined(error)) {
+      //       Process.stdout.write(' done\n')
+      //     } else {
+      //       Process.stdout.write(' error\n')
+      //     }
+
+      //   })
+
+      //   try {
+      //     await Migration.installMigration(configuration)
+      //   } finally {
+      //     Migration.off('postInstall', onInstallHandler.postInstall)
+      //     delete onInstallHandler.postInstall
+      //   }
+       
+      // } finally {
+      //   Migration.off('preInstall', onInstallHandler.preInstall)
+      //   delete onInstallHandler.preInstall
+      // }
+
+      await Migration.onNotInstalledMigration(async (migration) => {
+
+        Process.stdout.write(`Installing '${Path.relative('', migration.path)}' ...`)
+
+        try {
+          await migration.install()
+          Process.stdout.write(' done\n')
+        } catch (error) {
+          Process.stdout.write(' error\n')
+          throw error
+        }
+        
+      }, configuration)
 
     } catch (error) {
       Process.exitCode = 1
@@ -115,27 +144,63 @@ Command
   })
 
 Command
-  .command('uninstall [argument...]')
+  .command('uninstall')
   .description('Uninstall installed migrations')
-  .action(async (argument) => {
+  .action(async () => {
 
     Process.exitCode = 0
 
     try {
 
-      let option = Command.opts()
-      let onUnInstallHandler = null
+      let configuration = await LoadConfiguration(Command.opts().configurationPath)
+      console.log(`Loaded '${Path.relative('', configuration.path)}'`)
 
-      const { Migration } = await import(Path.resolve(option.migrationPath))
+      let { [configuration.migration.name]: Migration } = await import(Path.resolve(configuration.migration.path))
+      console.log(`Imported '${configuration.migration.name}' from '${Path.relative('', configuration.migration.path)}'`)
 
-      Migration.on('uninstall', onUnInstallHandler = (migration) => {
-        console.log(`Uninstalling '${Path.relative('', migration.path)}' ...`)
-      })
+      // let onUnInstallHandler = {}
 
-      await Migration.uninstallMigration(option.includeFrom, option.includeTo, ...argument)
+      // Migration.on('preUnInstall', onUnInstallHandler.preUnInstall = (migration) => {
+      //   Process.stdout.write(`Uninstalling '${Path.relative('', migration.path)}' ...`)
+      // })
 
-      Migration.off('uninstall', onUnInstallHandler)
-      onUnInstallHandler = null
+      // try {
+
+      //   Migration.on('postUnInstall', onUnInstallHandler.postUnInstall = (migration, error) => {
+
+      //     if (Is.undefined(error)) {
+      //       Process.stdout.write(' done\n')
+      //     } else {
+      //       Process.stdout.write(' error\n')
+      //     }
+
+      //   })
+
+      //   try {
+      //     await Migration.uninstallMigration(configuration)
+      //   } finally {
+      //     Migration.off('postUnInstall', onUnInstallHandler.postUnInstall)
+      //     delete onUnInstallHandler.postUnInstall
+      //   }
+
+      // } finally {
+      //   Migration.off('preUnInstall', onUnInstallHandler.preUnInstall)
+      //   delete onUnInstallHandler.preUnInstall
+      // }
+
+      await Migration.onInstalledMigration(async (migration) => {
+
+        Process.stdout.write(`Uninstalling '${Path.relative('', migration.path)}' ...`)
+
+        try {
+          await migration.uninstall()
+          Process.stdout.write(' done\n')
+        } catch (error) {
+          Process.stdout.write(' error\n')
+          throw error
+        }
+
+      }, configuration)
 
     } catch (error) {
       Process.exitCode = 1

@@ -1,0 +1,29 @@
+--------------------------------------------------
+ForkedProcess.onSpawn() processPath = 'release/command/index.js' processArgument = [] processOption = { serialization: 'advanced', stdio: 'pipe' }
+Usage: mablung-migration [options] [command]
+
+Options:
+  -V, --version                output the version number
+  --configuration-path <path>  Path of the configuration file (default:
+                               "./migration.cjs", "./migration.js", or
+                               "./migration.json")
+  -h, --help                   display help for command
+
+Commands:
+  create <name>                Create a new migration with the given name
+  list                         List all known migrations
+  install                      Install uninstalled migrations
+  uninstall                    Uninstall installed migrations
+  help [command]               display help for command
+ForkedProcess.onExit(1)
+--------------------------------------------------
+ForkedProcess.onSpawn() processPath = 'release/command/index.js' processArgument = ... processOption = { serialization: 'advanced', stdio: 'pipe' }
+[
+  '--configuration-path',
+  '/Volumes/Data/Users/fficnar/Projects/mablung-migration/release/test/command/index.json',
+  'create',
+  'create-migration'
+]
+Using configuration 'release/test/command/index.json'
+Created 'source/test/library/migration/1641865892839-create-migration.js'
+ForkedProcess.onExit(0)
