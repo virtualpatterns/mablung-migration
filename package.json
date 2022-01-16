@@ -13,8 +13,8 @@
     "release/library",
     "release/test/library/file-system-migration.*",
     "release/test/library/file-system-migration",
-    "source/library/migratiom",
-    "source/test/library/file-system-migratiom"
+    "source/library/migration",
+    "source/test/library/file-system-migration"
   ],
   "license": "GPL-3.0+",
   "name": "@virtualpatterns/mablung-migration",
