@@ -11,8 +11,8 @@
     "release/command",
     "release/index.*",
     "release/library",
-    "release/test/library/file-system-migration",
     "release/test/library/file-system-migration.*",
+    "release/test/library/file-system-migration",
     "source/library/migratiom",
     "source/test/library/file-system-migratiom"
   ],
