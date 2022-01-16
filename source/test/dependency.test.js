@@ -12,6 +12,7 @@ Test('default', async (test) => {
   let pathFrom = Path.resolve(FolderPath, '../../node_modules/resolve/test/resolver/malformed_package_json/package.json')
   let pathTo = Path.resolve(FolderPath, '../../node_modules/resolve/test/resolver/malformed_package_json/package.json.backup')
 
+  /* c8 ignore next 6 */
   if (await FileSystem.pathExists(pathFrom)) {
     await FileSystem.move(pathFrom, pathTo, { 'overwrite': true })
     test.log(`'${Path.relative('', pathFrom)}' renamed to '${Path.basename(pathTo)}'`)
