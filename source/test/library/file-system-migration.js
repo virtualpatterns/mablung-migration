@@ -6,7 +6,7 @@ import Path from 'path'
 const FilePath = __filePath
 const FolderPath = Path.dirname(FilePath)
 
-class FileSystemMigration extends CreateMigration(Migration, Path.resolve(FolderPath, './file-system-migration')) {
+class FileSystemMigration extends CreateMigration(Migration, Path.resolve(FolderPath, './file-system-migration'), Path.resolve(FolderPath, '../../../source/test/library/file-system-migration'), Path.resolve(FolderPath, '../../../source/test/library/file-system-migration/template.js')) {
 
   constructor(path, { 'install': { 'path': installPath } }) {
     super(path)

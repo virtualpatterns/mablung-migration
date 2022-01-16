@@ -9,9 +9,12 @@
   },
   "files": [
     "release/command",
+    "release/index.*",
     "release/library",
+    "release/test/library/file-system-migration",
     "release/test/library/file-system-migration.*",
-    "release/index.*"
+    "source/library/migratiom",
+    "source/test/library/file-system-migratiom"
   ],
   "license": "GPL-3.0+",
   "name": "@virtualpatterns/mablung-migration",

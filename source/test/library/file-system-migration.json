@@ -1,0 +1,9 @@
+{
+  "migration": {
+    "name": "FileSystemMigration",
+    "path": "./release/test/library/file-system-migration.js"
+  },
+  "install": {
+    "path": "./data/test/command/file-system-migration"
+  }
+}
