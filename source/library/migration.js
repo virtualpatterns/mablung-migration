@@ -9,8 +9,10 @@ const FolderPath = Path.dirname(FilePath)
 class Migration {
 
   constructor(path) {
+
     this.path = path
     this.name = Path.basename(this.path, Path.extname(this.path))
+
   }
 
   // derived class must implement ...

@@ -4,8 +4,8 @@ const FilePath = __filePath
 
 export default class extends Migration {
 
-  constructor(...argument) {
-    super(FilePath, ...argument)
+  constructor() {
+    super(FilePath)
   }
 
   // must implement directly or through inheritance ...

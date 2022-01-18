@@ -227,6 +227,86 @@ Test.serial('getMigration({ from: (non-migration), to: (non-migration) })', (tes
   })
 })
 
+Test.serial('onMigration(( ... ) => { ... }, { ... })', (test) => {
+
+  test.plan(4)
+
+  return test.notThrowsAsync(Migration.onMigration(async (oneMigration, index, allMigration) => {
+    test.is(oneMigration, allMigration[index])
+  }, Option))
+
+})
+
+Test.serial('onNotInstalledMigration(( ... ) => { ... }, { ... }) when migrations are not installed', async (test) => {
+
+  test.plan(4)
+
+  return test.notThrowsAsync(Migration.onNotInstalledMigration(async (oneMigration, index, allMigration) => {
+    test.is(oneMigration, allMigration[index])
+  }, Option))
+
+})
+
+Test.serial('onNotInstalledMigration(( ... ) => { ... }, { ... }) when migrations are installed', async (test) => {
+
+  await Migration.installMigration(Option)
+
+  test.plan(1)
+
+  return test.notThrowsAsync(Migration.onNotInstalledMigration(async (oneMigration, index, allMigration) => {
+    test.is(oneMigration, allMigration[index])
+  }, Option))
+
+})
+
+Test.serial('onNotInstalledMigration(( ... ) => { ... }, { ... }) when migrations are uninstalled', async (test) => {
+
+  await Migration.installMigration(Option)
+  await Migration.uninstallMigration(Option)
+
+  test.plan(4)
+
+  return test.notThrowsAsync(Migration.onNotInstalledMigration(async (oneMigration, index, allMigration) => {
+    test.is(oneMigration, allMigration[index])
+  }, Option))
+
+})
+
+Test.serial('onInstalledMigration(( ... ) => { ... }, { ... }) when migrations are not installed', async (test) => {
+
+  test.plan(1)
+
+  return test.notThrowsAsync(Migration.onInstalledMigration(async (oneMigration, index, allMigration) => {
+    test.is(oneMigration, allMigration[index])
+  }, Option))
+
+})
+
+Test.serial('onInstalledMigration(( ... ) => { ... }, { ... }) when migrations are installed', async (test) => {
+
+  await Migration.installMigration(Option)
+
+  test.plan(4)
+
+  return test.notThrowsAsync(Migration.onInstalledMigration(async (oneMigration, index, allMigration) => {
+    test.is(oneMigration, allMigration[index])
+  }, Option))
+
+})
+
+Test.serial('onInstalledMigration(( ... ) => { ... }, { ... }) when migrations are uninstalled', async (test) => {
+
+  await Migration.installMigration(Option)
+  await Migration.uninstallMigration(Option)
+
+  test.plan(1)
+
+  return test.notThrowsAsync(Migration.onInstalledMigration(async (oneMigration, index, allMigration) => {
+    test.is(oneMigration, allMigration[index])
+  }, Option))
+
+})
+
 Test.serial('installMigration({ ... })', async (test) => {
 
   await test.notThrowsAsync(Migration.installMigration(Option))
@@ -240,89 +320,89 @@ Test.serial('installMigration({ ... })', async (test) => {
 
 })
 
-Test.serial('installMigration({ from: ... })', async (test) => {
+// Test.serial('installMigration({ from: ... })', async (test) => {
 
-  let option = Configuration.getOption(Option, { 'include': { 'from': 1638155600628 } })
-  await test.notThrowsAsync(Migration.installMigration(option))
+//   let option = Configuration.getOption(Option, { 'include': { 'from': 1638155600628 } })
+//   await test.notThrowsAsync(Migration.installMigration(option))
 
-  let migration = await Migration.getMigration(Option)
+//   let migration = await Migration.getMigration(Option)
 
-  test.is(migration.length, 3)
-  test.is(await migration[0].isInstalled(), false)
-  test.is(await migration[1].isInstalled(), true)
-  test.is(await migration[2].isInstalled(), true)
+//   test.is(migration.length, 3)
+//   test.is(await migration[0].isInstalled(), false)
+//   test.is(await migration[1].isInstalled(), true)
+//   test.is(await migration[2].isInstalled(), true)
 
-})
+// })
 
-Test.serial('installMigration({ from: ..., to: ... })', async (test) => {
+// Test.serial('installMigration({ from: ..., to: ... })', async (test) => {
 
-  let option = Configuration.getOption(Option, { 'include': { 'from': 1638155600628, 'to': 1638155600628 } })
-  await test.notThrowsAsync(Migration.installMigration(option))
+//   let option = Configuration.getOption(Option, { 'include': { 'from': 1638155600628, 'to': 1638155600628 } })
+//   await test.notThrowsAsync(Migration.installMigration(option))
 
-  let migration = await Migration.getMigration(Option)
+//   let migration = await Migration.getMigration(Option)
 
-  test.is(migration.length, 3)
-  test.is(await migration[0].isInstalled(), false)
-  test.is(await migration[1].isInstalled(), true)
-  test.is(await migration[2].isInstalled(), false)
+//   test.is(migration.length, 3)
+//   test.is(await migration[0].isInstalled(), false)
+//   test.is(await migration[1].isInstalled(), true)
+//   test.is(await migration[2].isInstalled(), false)
 
-})
+// })
 
-Test.serial('installMigration({ to: ... })', async (test) => {
+// Test.serial('installMigration({ to: ... })', async (test) => {
 
-  let option = Configuration.getOption(Option, { 'include': { 'to': 1638155600628 } })
-  await test.notThrowsAsync(Migration.installMigration(option))
+//   let option = Configuration.getOption(Option, { 'include': { 'to': 1638155600628 } })
+//   await test.notThrowsAsync(Migration.installMigration(option))
 
-  let migration = await Migration.getMigration(Option)
+//   let migration = await Migration.getMigration(Option)
 
-  test.is(migration.length, 3)
-  test.is(await migration[0].isInstalled(), true)
-  test.is(await migration[1].isInstalled(), true)
-  test.is(await migration[2].isInstalled(), false)
+//   test.is(migration.length, 3)
+//   test.is(await migration[0].isInstalled(), true)
+//   test.is(await migration[1].isInstalled(), true)
+//   test.is(await migration[2].isInstalled(), false)
 
-})
+// })
 
-Test.serial('installMigration({ from: \'...\' })', async (test) => {
+// Test.serial('installMigration({ from: \'...\' })', async (test) => {
 
-  let option = Configuration.getOption(Option, { 'include': { 'from': Path.resolve(FolderPath, './migration-0/a/1638155600628-null.js') } })
-  await test.notThrowsAsync(Migration.installMigration(option))
+//   let option = Configuration.getOption(Option, { 'include': { 'from': Path.resolve(FolderPath, './migration-0/a/1638155600628-null.js') } })
+//   await test.notThrowsAsync(Migration.installMigration(option))
 
-  let migration = await Migration.getMigration(Option)
+//   let migration = await Migration.getMigration(Option)
 
-  test.is(migration.length, 3)
-  test.is(await migration[0].isInstalled(), false)
-  test.is(await migration[1].isInstalled(), true)
-  test.is(await migration[2].isInstalled(), true)
+//   test.is(migration.length, 3)
+//   test.is(await migration[0].isInstalled(), false)
+//   test.is(await migration[1].isInstalled(), true)
+//   test.is(await migration[2].isInstalled(), true)
 
-})
+// })
 
-Test.serial('installMigration({ from: \'...\', to: \'...\' })', async (test) => {
+// Test.serial('installMigration({ from: \'...\', to: \'...\' })', async (test) => {
 
-  let option = Configuration.getOption(Option, { 'include': { 'from': Path.resolve(FolderPath, './migration-0/a/1638155600628-null.js'), 'to': Path.resolve(FolderPath, './migration-0/a/1638155600628-null.js') } })
-  await test.notThrowsAsync(Migration.installMigration(option))
+//   let option = Configuration.getOption(Option, { 'include': { 'from': Path.resolve(FolderPath, './migration-0/a/1638155600628-null.js'), 'to': Path.resolve(FolderPath, './migration-0/a/1638155600628-null.js') } })
+//   await test.notThrowsAsync(Migration.installMigration(option))
 
-  let migration = await Migration.getMigration(Option)
+//   let migration = await Migration.getMigration(Option)
 
-  test.is(migration.length, 3)
-  test.is(await migration[0].isInstalled(), false)
-  test.is(await migration[1].isInstalled(), true)
-  test.is(await migration[2].isInstalled(), false)
+//   test.is(migration.length, 3)
+//   test.is(await migration[0].isInstalled(), false)
+//   test.is(await migration[1].isInstalled(), true)
+//   test.is(await migration[2].isInstalled(), false)
 
-})
+// })
 
-Test.serial('installMigration({ to: \'...\' })', async (test) => {
+// Test.serial('installMigration({ to: \'...\' })', async (test) => {
 
-  let option = Configuration.getOption(Option, { 'include': { 'to': Path.resolve(FolderPath, './migration-0/a/1638155600628-null.js') } })
-  await test.notThrowsAsync(Migration.installMigration(option))
+//   let option = Configuration.getOption(Option, { 'include': { 'to': Path.resolve(FolderPath, './migration-0/a/1638155600628-null.js') } })
+//   await test.notThrowsAsync(Migration.installMigration(option))
 
-  let migration = await Migration.getMigration(Option)
+//   let migration = await Migration.getMigration(Option)
 
-  test.is(migration.length, 3)
-  test.is(await migration[0].isInstalled(), true)
-  test.is(await migration[1].isInstalled(), true)
-  test.is(await migration[2].isInstalled(), false)
+//   test.is(migration.length, 3)
+//   test.is(await migration[0].isInstalled(), true)
+//   test.is(await migration[1].isInstalled(), true)
+//   test.is(await migration[2].isInstalled(), false)
 
-})
+// })
 
 Test.serial('uninstallMigration({ ... })', async (test) => {
 
@@ -338,130 +418,98 @@ Test.serial('uninstallMigration({ ... })', async (test) => {
 
 })
 
-Test.serial('uninstallMigration({ from: ... })', async (test) => {
+// Test.serial('uninstallMigration({ from: ... })', async (test) => {
 
-  await Migration.installMigration(Option)
+//   await Migration.installMigration(Option)
   
-  let option = Configuration.getOption(Option, { 'include': { 'from': 1638155600628 } })
-  await test.notThrowsAsync(Migration.uninstallMigration(option))
+//   let option = Configuration.getOption(Option, { 'include': { 'from': 1638155600628 } })
+//   await test.notThrowsAsync(Migration.uninstallMigration(option))
 
-  let migration = await Migration.getMigration(Option)
+//   let migration = await Migration.getMigration(Option)
 
-  test.is(migration.length, 3)
-  test.is(await migration[0].isInstalled(), true)
-  test.is(await migration[1].isInstalled(), false)
-  test.is(await migration[2].isInstalled(), false)
+//   test.is(migration.length, 3)
+//   test.is(await migration[0].isInstalled(), true)
+//   test.is(await migration[1].isInstalled(), false)
+//   test.is(await migration[2].isInstalled(), false)
 
-})
+// })
 
-Test.serial('uninstallMigration({ from: ..., to: ... })', async (test) => {
+// Test.serial('uninstallMigration({ from: ..., to: ... })', async (test) => {
 
-  await Migration.installMigration(Option)
+//   await Migration.installMigration(Option)
 
-  let option = Configuration.getOption(Option, { 'include': { 'from': 1638155600628, 'to': 1638155600628 } })
-  await test.notThrowsAsync(Migration.uninstallMigration(option))
+//   let option = Configuration.getOption(Option, { 'include': { 'from': 1638155600628, 'to': 1638155600628 } })
+//   await test.notThrowsAsync(Migration.uninstallMigration(option))
 
-  let migration = await Migration.getMigration(Option)
+//   let migration = await Migration.getMigration(Option)
 
-  test.is(migration.length, 3)
-  test.is(await migration[0].isInstalled(), true)
-  test.is(await migration[1].isInstalled(), false)
-  test.is(await migration[2].isInstalled(), true)
+//   test.is(migration.length, 3)
+//   test.is(await migration[0].isInstalled(), true)
+//   test.is(await migration[1].isInstalled(), false)
+//   test.is(await migration[2].isInstalled(), true)
 
-})
+// })
 
-Test.serial('uninstallMigration({ to: ... })', async (test) => {
+// Test.serial('uninstallMigration({ to: ... })', async (test) => {
 
-  await Migration.installMigration(Option)
+//   await Migration.installMigration(Option)
 
-  let option = Configuration.getOption(Option, { 'include': { 'to': 1638155600628 } })
-  await test.notThrowsAsync(Migration.uninstallMigration(option))
+//   let option = Configuration.getOption(Option, { 'include': { 'to': 1638155600628 } })
+//   await test.notThrowsAsync(Migration.uninstallMigration(option))
 
-  let migration = await Migration.getMigration(Option)
+//   let migration = await Migration.getMigration(Option)
 
-  test.is(migration.length, 3)
-  test.is(await migration[0].isInstalled(), false)
-  test.is(await migration[1].isInstalled(), false)
-  test.is(await migration[2].isInstalled(), true)
+//   test.is(migration.length, 3)
+//   test.is(await migration[0].isInstalled(), false)
+//   test.is(await migration[1].isInstalled(), false)
+//   test.is(await migration[2].isInstalled(), true)
 
-})
+// })
 
-Test.serial('uninstallMigration({ from: \'...\' })', async (test) => {
+// Test.serial('uninstallMigration({ from: \'...\' })', async (test) => {
 
-  await Migration.installMigration(Option)
+//   await Migration.installMigration(Option)
 
-  let option = Configuration.getOption(Option, { 'include': { 'from': Path.resolve(FolderPath, './migration-0/a/1638155600628-null.js') } })
-  await test.notThrowsAsync(Migration.uninstallMigration(option))
+//   let option = Configuration.getOption(Option, { 'include': { 'from': Path.resolve(FolderPath, './migration-0/a/1638155600628-null.js') } })
+//   await test.notThrowsAsync(Migration.uninstallMigration(option))
 
-  let migration = await Migration.getMigration(Option)
+//   let migration = await Migration.getMigration(Option)
 
-  test.is(migration.length, 3)
-  test.is(await migration[0].isInstalled(), true)
-  test.is(await migration[1].isInstalled(), false)
-  test.is(await migration[2].isInstalled(), false)
+//   test.is(migration.length, 3)
+//   test.is(await migration[0].isInstalled(), true)
+//   test.is(await migration[1].isInstalled(), false)
+//   test.is(await migration[2].isInstalled(), false)
 
-})
+// })
 
-Test.serial('uninstallMigration({ from: \'...\', to: \'...\' })', async (test) => {
+// Test.serial('uninstallMigration({ from: \'...\', to: \'...\' })', async (test) => {
 
-  await Migration.installMigration(Option)
+//   await Migration.installMigration(Option)
 
-  let option = Configuration.getOption(Option, { 'include': { 'from': Path.resolve(FolderPath, './migration-0/a/1638155600628-null.js'), 'to': Path.resolve(FolderPath, './migration-0/a/1638155600628-null.js') } })
-  await test.notThrowsAsync(Migration.uninstallMigration(option))
+//   let option = Configuration.getOption(Option, { 'include': { 'from': Path.resolve(FolderPath, './migration-0/a/1638155600628-null.js'), 'to': Path.resolve(FolderPath, './migration-0/a/1638155600628-null.js') } })
+//   await test.notThrowsAsync(Migration.uninstallMigration(option))
 
-  let migration = await Migration.getMigration(Option)
+//   let migration = await Migration.getMigration(Option)
 
-  test.is(migration.length, 3)
-  test.is(await migration[0].isInstalled(), true)
-  test.is(await migration[1].isInstalled(), false)
-  test.is(await migration[2].isInstalled(), true)
+//   test.is(migration.length, 3)
+//   test.is(await migration[0].isInstalled(), true)
+//   test.is(await migration[1].isInstalled(), false)
+//   test.is(await migration[2].isInstalled(), true)
 
-})
+// })
 
-Test.serial('uninstallMigration({ to: \'...\' })', async (test) => {
+// Test.serial('uninstallMigration({ to: \'...\' })', async (test) => {
 
-  await Migration.installMigration(Option)
+//   await Migration.installMigration(Option)
 
-  let option = Configuration.getOption(Option, { 'include': { 'to': Path.resolve(FolderPath, './migration-0/a/1638155600628-null.js') } })
-  await test.notThrowsAsync(Migration.uninstallMigration(option))
+//   let option = Configuration.getOption(Option, { 'include': { 'to': Path.resolve(FolderPath, './migration-0/a/1638155600628-null.js') } })
+//   await test.notThrowsAsync(Migration.uninstallMigration(option))
 
-  let migration = await Migration.getMigration(Option)
+//   let migration = await Migration.getMigration(Option)
 
-  test.is(migration.length, 3)
-  test.is(await migration[0].isInstalled(), false)
-  test.is(await migration[1].isInstalled(), false)
-  test.is(await migration[2].isInstalled(), true)
+//   test.is(migration.length, 3)
+//   test.is(await migration[0].isInstalled(), false)
+//   test.is(await migration[1].isInstalled(), false)
+//   test.is(await migration[2].isInstalled(), true)
 
-})
-
-Test.serial('onMigration(( ... ) => { ... }, { ... })', (test) => {
-
-  test.plan(4)
-
-  return test.notThrowsAsync(Migration.onMigration(async (oneMigration, index, allMigration) => {
-    test.is(oneMigration, allMigration[index])
-  }, Option))
-
-})
-
-Test.serial('onNotInstalledMigration(( ... ) => { ... }, { ... })', async (test) => {
-
-  test.plan(4)
-
-  return test.notThrowsAsync(Migration.onNotInstalledMigration(async (oneMigration, index, allMigration) => {
-    test.is(oneMigration, allMigration[index])
-  }, Option))
-
-})
-
-Test.serial('onInstalledMigration(( ... ) => { ... }, { ... })', async (test) => {
-
-  await Migration.installMigration(Option)
-
-  test.plan(4)
-
-  return test.notThrowsAsync(Migration.onInstalledMigration(async (oneMigration, index, allMigration) => {
-    test.is(oneMigration, allMigration[index])
-  }, Option))
-
-})
+// })
