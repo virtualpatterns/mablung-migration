@@ -35,7 +35,7 @@ Test.serial('create', async (test) => {
   let name = `create-migration-for-${Path.basename(FilePath, Path.extname(FilePath)).replace('.test', '')}`
 
   let process = new LoggedProcess(Path.resolve(FolderPath, '../../command/index.js'), {
-    '--configuration-path': Path.resolve(FolderPath, './null-migration.json'),
+    '--configuration-path': Path.resolve(FolderPath, './migration.json'),
     'create': name
   })
 
@@ -81,7 +81,7 @@ Test.serial('create throws ENOENT', async (test) => {
 Test.serial('list', async (test) => {
 
   let process = new LoggedProcess(Path.resolve(FolderPath, '../../command/index.js'), {
-    '--configuration-path': Path.resolve(FolderPath, './null-migration.json'),
+    '--configuration-path': Path.resolve(FolderPath, './migration.json'),
     'list': true
   })
 
@@ -103,13 +103,13 @@ Test.serial('list throws ENOENT', async (test) => {
 Test.serial('install', async (test) => {
 
   let process = new LoggedProcess(Path.resolve(FolderPath, '../../command/index.js'), {
-    '--configuration-path': Path.resolve(FolderPath, './null-migration.json'),
+    '--configuration-path': Path.resolve(FolderPath, './migration.json'),
     'install': true
   })
 
   test.is(await process.whenExit(), 0)
   
-  let option = await Configuration.load(Path.resolve(FolderPath, './null-migration.json'))
+  let option = await Configuration.load(Path.resolve(FolderPath, './migration.json'))
   let migration = await Migration.getMigration(option)
 
   test.is(migration.length, 3)
@@ -135,20 +135,20 @@ Test.serial('uninstall', async (test) => {
   let process = null
 
   process = new LoggedProcess(Path.resolve(FolderPath, '../../command/index.js'), {
-    '--configuration-path': Path.resolve(FolderPath, './null-migration.json'),
+    '--configuration-path': Path.resolve(FolderPath, './migration.json'),
     'install': true
   })
 
   test.is(await process.whenExit(), 0)
 
   process = new LoggedProcess(Path.resolve(FolderPath, '../../command/index.js'), {
-    '--configuration-path': Path.resolve(FolderPath, './null-migration.json'),
+    '--configuration-path': Path.resolve(FolderPath, './migration.json'),
     'uninstall': true
   })
 
   test.is(await process.whenExit(), 0)
 
-  let option = await Configuration.load(Path.resolve(FolderPath, './null-migration.json'))
+  let option = await Configuration.load(Path.resolve(FolderPath, './migration.json'))
   let migration = await Migration.getMigration(option)
 
   test.is(migration.length, 3)
