@@ -117,23 +117,17 @@ class Migration {
         return import(Path.resolve(path, file.name))
           .then(({ 'default': Migration }) => new Migration(option))
       })
-      // .map((file) => this.createMigrationFromPath(Path.resolve(path, file.name), option))
 
     return [ ...rawMigrationFromPath, ...rawMigration ].flat()
 
   }
 
-  // static async createMigrationFromPath(path, option) {
-  //   let Migration = await import(path)
-  //   return new Migration(option)
-  // }
-
   static async onMigration(fn, option) { 
 
     let migration = await this.getMigration(option)
 
-    for (let item of migration) {
-      await fn(item)
+    for (let index = 0; index < migration.length; index ++) {
+      await fn(migration[index], index, migration)
     }
 
   }
@@ -147,8 +141,8 @@ class Migration {
       .filter((isInstalled) => isInstalled)
       .map((isInstalled, index) => migration[index])
 
-    for (let item of migration.reverse()) {
-      await fn(item)
+    for (let index = migration.length - 1; index >= 0; index--) {
+      await fn(migration[index], index, migration)
     }
 
   }
@@ -162,8 +156,8 @@ class Migration {
       .filter((isInstalled) => !isInstalled)
       .map((isInstalled, index) => migration[index])
 
-    for (let item of migration) {
-      await fn(item)
+    for (let index = 0; index < migration.length; index++) {
+      await fn(migration[index], index, migration)
     }
 
   }

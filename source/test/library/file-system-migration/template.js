@@ -4,8 +4,8 @@ const FilePath = __filePath
 
 export default class extends FileSystemMigration {
 
-  constructor(option) {
-    super(FilePath, option)
+  constructor(...argument) {
+    super(FilePath, ...argument)
   }
 
 }

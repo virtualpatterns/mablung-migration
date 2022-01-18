@@ -8,9 +8,4 @@ export default class extends Migration {
     super(FilePath, ...argument)
   }
 
-  // must implement directly or through inheritance ...
-  // async isInstalled() {}
-  // async install() {}
-  // async uninstall() {}
-
 }

@@ -12,5 +12,5 @@
     "text-summary"
   ],
   "src": "release",
-  "tempDirectory": "data/coverage"
+  "tempDirectory": "data/cache/coverage"
 }
