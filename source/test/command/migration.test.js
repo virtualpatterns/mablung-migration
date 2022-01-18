@@ -5,7 +5,7 @@ import { ForkedProcess } from '@virtualpatterns/mablung-worker'
 import Path from 'path'
 import Test from 'ava'
 
-import { NullMigration } from '../library/null-migration.js'
+import { Migration } from '../library/migration.js'
 
 const FilePath = __filePath
 const FolderPath = Path.dirname(FilePath)
@@ -110,7 +110,7 @@ Test.serial('install', async (test) => {
   test.is(await process.whenExit(), 0)
   
   let option = await Configuration.load(Path.resolve(FolderPath, './null-migration.json'))
-  let migration = await NullMigration.getMigration(option)
+  let migration = await Migration.getMigration(option)
 
   test.is(migration.length, 3)
   test.is(await migration[0].isInstalled(), true)
@@ -149,7 +149,7 @@ Test.serial('uninstall', async (test) => {
   test.is(await process.whenExit(), 0)
 
   let option = await Configuration.load(Path.resolve(FolderPath, './null-migration.json'))
-  let migration = await NullMigration.getMigration(option)
+  let migration = await Migration.getMigration(option)
 
   test.is(migration.length, 3)
   test.is(await migration[0].isInstalled(), false)

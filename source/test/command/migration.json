@@ -1,0 +1,9 @@
+{
+  "migration": {
+    "name": "Migration",
+    "path": "./release/test/library/migration.js"
+  },
+  "install": {
+    "path": "./data/test/command/migration"
+  }
+}
