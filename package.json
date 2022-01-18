@@ -23,7 +23,7 @@
     "url": "https://github.com/virtualpatterns/mablung-migration"
   },
   "type": "module",
-  "version": "0.0.1-63",
+  "version": "0.0.1-64",
   "dependencies": {
     "@pwn/is": "^1.0.2",
     "@virtualpatterns/mablung-configuration": "0.0.2-49",
