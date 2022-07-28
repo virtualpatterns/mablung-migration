@@ -1,8 +1,7 @@
 import { Configuration } from '@virtualpatterns/mablung-configuration'
-import { CreateLoggedProcess } from '@virtualpatterns/mablung-worker/test'
+import { CreateRandomId, LoggedForkedProcess } from '@virtualpatterns/mablung-worker/test'
 import { FileSystem } from '@virtualpatterns/mablung-file-system'
-import { ForkedProcess } from '@virtualpatterns/mablung-worker'
-import Path from 'path'
+import { Path } from '@virtualpatterns/mablung-path'
 import Test from 'ava'
 
 import { Migration } from '../library/migration.js'
@@ -10,32 +9,34 @@ import { Migration } from '../library/migration.js'
 const FilePath = __filePath
 const FolderPath = Path.dirname(FilePath)
 
-const DataPath = FilePath.replace('/release/', '/data/').replace('.test.js', '')
-const InstallPath = DataPath
-const LogPath = DataPath.concat('.log')
-const LoggedProcess = CreateLoggedProcess(ForkedProcess, LogPath)
+const DataPath = FilePath.replace('/release/', '/data/').replace(/\.test\.c?js/, '')
 
-Test.before(async () => {
-  await FileSystem.ensureDir(Path.dirname(LogPath))
-  return FileSystem.remove(LogPath)
+Test.before(() => {
+  return FileSystem.emptyDir(DataPath)
 })
 
-Test.beforeEach(async () => {
-  await FileSystem.remove(InstallPath)
-  return FileSystem.ensureDir(InstallPath)
+Test.beforeEach(async (test) => {
+
+  let id = await CreateRandomId()
+  let logPath = Path.resolve(DataPath, `${id}.log`)
+
+  test.context.logPath = logPath
+
+  // test.log(`test.context.logPath = '${Path.relative('', test.context.logPath)}'`)
+
 })
 
-Test.serial('default', async (test) => {
-  let process = new LoggedProcess(Path.resolve(FolderPath, '../../command/index.js'))
+Test('default', async (test) => {
+  let process = new LoggedForkedProcess(test.context.logPath, Path.resolve(FolderPath, '../../command/index.js'))
   test.is(await process.whenExit(), 1)
 })
 
-Test.serial('create', async (test) => {
+Test('create', async (test) => {
 
   let name = `create-migration-for-${Path.basename(FilePath, Path.extname(FilePath)).replace('.test', '')}`
 
-  let process = new LoggedProcess(Path.resolve(FolderPath, '../../command/index.js'), {
-    '--configuration-path': Path.resolve(FolderPath, './migration.json'),
+  let process = new LoggedForkedProcess(test.context.logPath, Path.resolve(FolderPath, '../../command/index.js'), {
+    '--configuration-path': Path.resolve(FolderPath, 'migration.json'),
     'create': name
   })
 
@@ -65,12 +66,12 @@ Test.serial('create', async (test) => {
 
 })
 
-Test.serial('create throws ENOENT', async (test) => {
+Test('create throws ENOENT', async (test) => {
 
   let name = 'create-migration'
 
-  let process = new LoggedProcess(Path.resolve(FolderPath, '../../command/index.js'), {
-    '--configuration-path': Path.resolve(FolderPath, './error.json'),
+  let process = new LoggedForkedProcess(test.context.logPath, Path.resolve(FolderPath, '../../command/index.js'), {
+    '--configuration-path': Path.resolve(FolderPath, 'error.json'),
     'create': name
   })
 
@@ -78,10 +79,10 @@ Test.serial('create throws ENOENT', async (test) => {
 
 })
 
-Test.serial('list', async (test) => {
+Test('list', async (test) => {
 
-  let process = new LoggedProcess(Path.resolve(FolderPath, '../../command/index.js'), {
-    '--configuration-path': Path.resolve(FolderPath, './migration.json'),
+  let process = new LoggedForkedProcess(test.context.logPath, Path.resolve(FolderPath, '../../command/index.js'), {
+    '--configuration-path': Path.resolve(FolderPath, 'migration.json'),
     'list': true
   })
 
@@ -89,10 +90,10 @@ Test.serial('list', async (test) => {
 
 })
 
-Test.serial('list throws ENOENT', async (test) => {
+Test('list throws ENOENT', async (test) => {
 
-  let process = new LoggedProcess(Path.resolve(FolderPath, '../../command/index.js'), {
-    '--configuration-path': Path.resolve(FolderPath, './error.json'),
+  let process = new LoggedForkedProcess(test.context.logPath, Path.resolve(FolderPath, '../../command/index.js'), {
+    '--configuration-path': Path.resolve(FolderPath, 'error.json'),
     'list': true
   })
 
@@ -100,16 +101,16 @@ Test.serial('list throws ENOENT', async (test) => {
 
 })
 
-Test.serial('install', async (test) => {
+Test('install', async (test) => {
 
-  let process = new LoggedProcess(Path.resolve(FolderPath, '../../command/index.js'), {
-    '--configuration-path': Path.resolve(FolderPath, './migration.json'),
+  let process = new LoggedForkedProcess(test.context.logPath, Path.resolve(FolderPath, '../../command/index.js'), {
+    '--configuration-path': Path.resolve(FolderPath, 'migration.json'),
     'install': true
   })
 
   test.is(await process.whenExit(), 0)
   
-  let option = await Configuration.load(Path.resolve(FolderPath, './migration.json'))
+  let option = await Configuration.load(Path.resolve(FolderPath, 'migration.json'))
   let migration = await Migration.getMigration(option)
 
   test.is(migration.length, 3)
@@ -119,10 +120,10 @@ Test.serial('install', async (test) => {
 
 })
 
-Test.serial('install throws ENOENT', async (test) => {
+Test('install throws ENOENT', async (test) => {
 
-  let process = new LoggedProcess(Path.resolve(FolderPath, '../../command/index.js'), {
-    '--configuration-path': Path.resolve(FolderPath, './error.json'),
+  let process = new LoggedForkedProcess(test.context.logPath, Path.resolve(FolderPath, '../../command/index.js'), {
+    '--configuration-path': Path.resolve(FolderPath, 'error.json'),
     'install': true
   })
 
@@ -130,25 +131,25 @@ Test.serial('install throws ENOENT', async (test) => {
 
 })
 
-Test.serial('uninstall', async (test) => {
+Test('uninstall', async (test) => {
 
   let process = null
 
-  process = new LoggedProcess(Path.resolve(FolderPath, '../../command/index.js'), {
-    '--configuration-path': Path.resolve(FolderPath, './migration.json'),
+  process = new LoggedForkedProcess(test.context.logPath, Path.resolve(FolderPath, '../../command/index.js'), {
+    '--configuration-path': Path.resolve(FolderPath, 'migration.json'),
     'install': true
   })
 
   test.is(await process.whenExit(), 0)
 
-  process = new LoggedProcess(Path.resolve(FolderPath, '../../command/index.js'), {
-    '--configuration-path': Path.resolve(FolderPath, './migration.json'),
+  process = new LoggedForkedProcess(test.context.logPath, Path.resolve(FolderPath, '../../command/index.js'), {
+    '--configuration-path': Path.resolve(FolderPath, 'migration.json'),
     'uninstall': true
   })
 
   test.is(await process.whenExit(), 0)
 
-  let option = await Configuration.load(Path.resolve(FolderPath, './migration.json'))
+  let option = await Configuration.load(Path.resolve(FolderPath, 'migration.json'))
   let migration = await Migration.getMigration(option)
 
   test.is(migration.length, 3)
@@ -158,10 +159,10 @@ Test.serial('uninstall', async (test) => {
 
 })
 
-Test.serial('uninstall throws ENOENT', async (test) => {
+Test('uninstall throws ENOENT', async (test) => {
 
-  let process = new LoggedProcess(Path.resolve(FolderPath, '../../command/index.js'), {
-    '--configuration-path': Path.resolve(FolderPath, './error.json'),
+  let process = new LoggedForkedProcess(test.context.logPath, Path.resolve(FolderPath, '../../command/index.js'), {
+    '--configuration-path': Path.resolve(FolderPath, 'error.json'),
     'uninstall': true
   })
 

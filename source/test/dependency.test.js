@@ -1,6 +1,6 @@
 import { Check } from '@virtualpatterns/mablung-check-dependency'
 import { FileSystem } from '@virtualpatterns/mablung-file-system'
-import Path from 'path'
+import { Path } from '@virtualpatterns/mablung-path'
 import Test from 'ava'
 
 const FilePath = __filePath
@@ -24,6 +24,7 @@ Test('default', async (test) => {
 
   // test.log(dependency)
   test.deepEqual(dependency.missing, {})
+  test.deepEqual(dependency.section, {})
   test.deepEqual(dependency.unused, [])
 
 })

@@ -1,7 +1,7 @@
 import { Configuration } from '@virtualpatterns/mablung-configuration'
 import { FileSystem } from '@virtualpatterns/mablung-file-system'
+import { Path } from '@virtualpatterns/mablung-path'
 import Is from '@pwn/is'
-import Path from 'path'
 
 const FilePath = __filePath
 const FolderPath = Path.dirname(FilePath)
@@ -51,7 +51,7 @@ class Migration {
   }
 
   static getRawMigration(option) {
-    return this.getRawMigrationFromPath(Path.resolve(FolderPath, './migration'), option)
+    return this.getRawMigrationFromPath(Path.resolve(FolderPath, 'migration'), option)
   }
 
   static getRawMigrationFromPath(path, userOption = {}) {

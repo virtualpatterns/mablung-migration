@@ -1,25 +1,32 @@
-import { CreateLoggedProcess } from '@virtualpatterns/mablung-worker/test'
+import { CreateRandomId, LoggedForkedProcess } from '@virtualpatterns/mablung-worker/test'
 import { FileSystem } from '@virtualpatterns/mablung-file-system'
-import { ForkedProcess } from '@virtualpatterns/mablung-worker'
-import Path from 'path'
+import { Path } from '@virtualpatterns/mablung-path'
 import Test from 'ava'
 
 const FilePath = __filePath
 const FolderPath = Path.dirname(FilePath)
 
-const DataPath = FilePath.replace('/release/', '/data/').replace('.test.js', '')
-const LogPath = DataPath.concat('.log')
-const LoggedProcess = CreateLoggedProcess(ForkedProcess, LogPath)
+const DataPath = FilePath.replace('/release/', '/data/').replace(/\.test\.c?js/, '')
 
-Test.before(async () => {
-  await FileSystem.ensureDir(Path.dirname(LogPath))
-  return FileSystem.remove(LogPath)
+Test.before(() => {
+  return FileSystem.emptyDir(DataPath)
 })
 
-Test.serial('uninstall throws Error', async (test) => {
+Test.beforeEach(async (test) => {
 
-  let process = new LoggedProcess(Path.resolve(FolderPath, '../../command/index.js'), {
-    '--configuration-path': Path.resolve(FolderPath, './uninstall-error-migration.json'),
+  let id = await CreateRandomId()
+  let logPath = Path.resolve(DataPath, `${id}.log`)
+
+  test.context.logPath = logPath
+
+  // test.log(`test.context.logPath = '${Path.relative('', test.context.logPath)}'`)
+
+})
+
+Test('uninstall throws Error', async (test) => {
+
+  let process = new LoggedForkedProcess(test.context.logPath, Path.resolve(FolderPath, '../../command/index.js'), {
+    '--configuration-path': Path.resolve(FolderPath, 'uninstall-error-migration.json'),
     'uninstall': true
   })
 

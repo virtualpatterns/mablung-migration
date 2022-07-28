@@ -1,11 +1,11 @@
 import '@virtualpatterns/mablung-source-map-support/install'
 
-import Path from 'path'
+import { Path } from '@virtualpatterns/mablung-path'
 
 const FilePath = __filePath
-const FolderPath = Path.dirname(FilePath)
+const FolderPath = __folderPath
 
-// class Migration extends CreateMigration(BaseMigration, Path.resolve(`${FolderPath}/../../../source/test/library/migration`), Path.resolve(`${FolderPath}/../../../source/test/library/migration/template.js`), `${FolderPath}/migration`) {
+// class Migration extends CreateMigration(BaseMigration, Path.resolve(Path.resolve(FolderPath, '../../../source/test/library/migration`), Path.resolve(`${FolderPath}/../../../source/test/library/migration/template.js`), `${FolderPath}/migration')) {
 
 const Process = process
 

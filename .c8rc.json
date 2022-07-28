@@ -1,16 +1,17 @@
 {
   "all": true,
   "exclude": [
+    "ava.config.js",
     "release/library/migration",
     "release/sandbox",
     "release/test/command/migration",
-    "release/test/library/migration",
-    "ava.config.cjs"
+    "release/test/library/migration"
   ],
+  "reportDir": "data/c8", 
   "reporter": [
     "html",
     "text-summary"
   ],
   "src": "release",
-  "tempDirectory": "data/cache/coverage"
+  "tempDirectory": "data/cache/c8"
 }

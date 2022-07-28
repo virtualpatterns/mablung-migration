@@ -1,7 +1,7 @@
 import { FileSystem } from '@virtualpatterns/mablung-file-system'
+import { Path } from '@virtualpatterns/mablung-path'
 
-const Require = __require
+const FilePath = __filePath
+const FolderPath = Path.dirname(FilePath)
 
-const Package = FileSystem.readJsonSync(Require.resolve('../../../package.json'), { 'encoding': 'utf-8' })
-
-export { Package }
+export const Package = FileSystem.readJsonSync(Path.resolve(FolderPath, '../../../package.json'), { 'encoding': 'utf-8' })

@@ -1,12 +1,12 @@
 import { CreateMigration, Migration } from '@virtualpatterns/mablung-migration'
 import { FileSystem } from '@virtualpatterns/mablung-file-system'
+import { Path } from '@virtualpatterns/mablung-path'
 import Is from '@pwn/is'
-import Path from 'path'
 
 const FilePath = __filePath
 const FolderPath = Path.dirname(FilePath)
 
-class FileSystemMigration extends CreateMigration(Migration, Path.resolve(FolderPath, './file-system-migration'), Path.resolve(FolderPath, '../../../source/test/library/file-system-migration'), Path.resolve(FolderPath, '../../../source/test/library/file-system-migration/template.js')) {
+class FileSystemMigration extends CreateMigration(Migration, Path.resolve(FolderPath, 'file-system-migration'), Path.resolve(FolderPath, '../../../source/test/library/file-system-migration'), Path.resolve(FolderPath, '../../../source/test/library/file-system-migration/template.js')) {
 
   constructor(path, { 'install': { 'path': installPath } }) {
     super(path)

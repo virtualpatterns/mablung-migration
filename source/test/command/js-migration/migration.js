@@ -1,8 +1,6 @@
-export default function () {
-  return Promise.resolve({
-    'migration': {
-      'name': 'Migration',
-      'path': '../../../library/migration.js'
-    }
-  })
+export default {
+  'migration': {
+    'name': 'Migration',
+    'path': '../../../library/migration.js'
+  }
 }

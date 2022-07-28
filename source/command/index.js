@@ -2,8 +2,8 @@
 
 import '@virtualpatterns/mablung-source-map-support/install'
 
-import Command from 'commander'
-import Path from 'path'
+import { program as Command } from 'commander'
+import { Path } from '@virtualpatterns/mablung-path'
 
 import { LoadConfiguration } from './library/load-configuration.js'
 import { Package } from './library/package.js'
